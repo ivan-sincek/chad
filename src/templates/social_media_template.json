@@ -1,0 +1,43 @@
+{
+   "telegram":{
+      "extract":"t\\.me\\/[\\w\\d\\-\\+]+",
+      "extract_prepend":"https://",
+      "validate":"<meta property=\"og:title\" content=\"Telegram: Contact .+?\">"
+   },
+   "discord":{
+      "extract":"discord\\.com\\/invite\\/[\\w\\d\\-\\+\\.]+(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"Invite Invalid"
+   },
+   "youtube":{
+      "extract":"youtube\\.com\\/(?:c|channel)\\/[\\w\\d\\-\\+\\.]+(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"This page isn't available\\."
+   },
+   "twitter":{
+      "extract":"(?<!pic\\.)twitter\\.com\\/(?:(?!(?:hashtag|i|intent|share)(?:\\/|\\?)[^\\s]+|[\\w]+\\/(?:privacy|tos)|widgets\\.js)[\\w\\d\\-\\+]+)",
+      "extract_prepend":"https://",
+      "validate":"This account doesn.?t exist"
+   },
+   "instagram":{
+      "extract":"instagram\\.com\\/(?:(?!(?:p|accounts)(?:\\/|\\?)[^\\s]+)[\\w\\d\\-\\+\\.]+)(?<!\\.)",
+      "extract_prepend":"https://",
+      "extract_append":"/",
+      "validate":"Sorry, this page isn't available\\."
+   },
+   "facebook":{
+      "extract":"facebook\\.com\\/(?:(?!(?:about|groups|sharer)(?:\\/|\\?)[^\\s]+|share\\.php)[\\w\\d\\-\\+\\.]+)(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"This page isn't available"
+   },
+   "linkedin-company":{
+      "extract":"linkedin\\.com\\/company\\/[\\w\\d\\-\\+\\.]+(?<!\\.)",
+      "extract_prepend":"https://hr.",
+      "validate":"Page not found"
+   },
+   "linkedin-user":{
+      "extract":"linkedin\\.com\\/in\\/[\\w\\d\\-\\+\\.]+(?<!\\.)",
+      "extract_prepend":"https://hr.",
+      "validate":"An exact match for .+ could not be found\\."
+   }
+}
