@@ -48,7 +48,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-5.0-py3-none-any.whl
+python3 -m pip install dist/google_chad-5.1-py3-none-any.whl
 
 playwright install chromium
 ```
@@ -81,7 +81,7 @@ There is a 4 seconds delay between starting each headless browser; otherwise, it
 
 ### Extracting and Validating Data
 
-Chad Extractor was mainly designed to extract and validate data from Chad results; but, you can also use it to extract and validate data from plaintext files by specifying `-pt yes` flag - where plaintext files will be treated similar to server responses and extraction logic will be immediately applied.
+Chad Extractor was mainly designed to extract and validate data from Chad results; but, you can also use it to extract and validate data from plaintext files by specifying `-pt yes` flag - plaintext files will be treated like server responses and extraction logic will be immediately applied.
 
 ## Advanced Example: Social Media Takover
 
@@ -173,6 +173,7 @@ Manually check if social media URLs in `summary --> validated` are available for
 
 ```json
 {
+   "started_at":"2023-12-24 03:30:10",
    "summary":{
       "validated":[
          "https://t.me/does_not_exist"
@@ -246,7 +247,7 @@ Additionally, to avoid hitting e.g. Instagram's rate limit with Chad Extractor, 
 ## Usage
 
 ```fundamental
-Chad v5.0 ( github.com/ivan-sincek/chad )
+Chad v5.1 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-a agents         ] [-p proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-a user_agents.txt] [-p proxies.txt] [-o results.json]
@@ -313,7 +314,7 @@ DEBUG
 ```
 
 ```fundamental
-Chad Extractor v5.0 ( github.com/ivan-sincek/chad )
+Chad Extractor v5.1 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results -o out                 [-th threads] [-r retries] [-w wait] [-a agents         ]
 Example: chad-extractor -t template.json -res results -o results_report.json [-th 10     ] [-r 5      ] [-w 10  ] [-a user_agents.txt]
@@ -325,13 +326,14 @@ TEMPLATE
     -t <template> - template.json | etc.
 RESULTS DIRECTORY/FILE
     Directory containing Chad results or plaintext files, or a single file
-    Files ending in '.report.json' will be ignored
+    Files ending with '.report.json' will be ignored
     -res <results> - results | results.json | urls.txt | etc.
 PLAINTEXT
     Treat files as plaintext
     -pt <plaintext> - yes
 EXCLUDES
     File with regular expressions or a single expression to exclude the page content
+    Applies only on extraction
     -e <excludes> - regexes.txt | "<div id=\"seo\">.+?<\/div>" | etc.
 THREADS
     Number of parallel headless browsers to run

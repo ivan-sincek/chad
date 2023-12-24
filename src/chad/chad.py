@@ -52,10 +52,10 @@ def write_file(data, out):
 			print(("Cannot save results to '{0}'").format(out))
 
 def write_file_silent(data, out):
-    try:
-        open(out, "wb").write(data)
-    except FileNotFoundError:
-        pass
+	try:
+		open(out, "wb").write(data)
+	except FileNotFoundError:
+		pass
 
 def jdump(data):
 	return json.dumps(data, indent = 4, ensure_ascii = False)
@@ -345,7 +345,7 @@ class Progress:
 		self.__total = total
 		self.__count = 0
 
-	def __show(self):
+	def show(self):
 		print(("Progress: {0}/{1} | {2:.2f}%").format(self.__count, self.__total, (self.__count / self.__total) * 100), end = "\n" if self.__count == self.__total else "\r")
 		self.__count += 1
 
@@ -378,7 +378,7 @@ class Validate:
 
 	def __basic(self):
 		self.__proceed = False
-		print("Chad v5.0 ( github.com/ivan-sincek/chad )")
+		print("Chad v5.1 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-a agents         ] [-p proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-a user_agents.txt] [-p proxies.txt] [-o results.json]")
@@ -458,7 +458,7 @@ class Validate:
 	def __validate(self, key, value):
 		value = value.strip()
 		if len(value) > 0:
-			# --------------------
+			# ----------------------------
 			if key == "-q" and self.__args["queries"] is None:
 				self.__args["queries"] = value
 				if os.path.isfile(self.__args["queries"]):
@@ -472,10 +472,10 @@ class Validate:
 							self.__error("No Google Dorks were found")
 				else:
 					self.__args["queries"] = [self.__args["queries"]]
-			# --------------------
+			# ----------------------------
 			elif key == "-s" and self.__args["site"] is None:
 				self.__args["site"] = value
-			# --------------------
+			# ----------------------------
 			elif key == "-t" and self.__args["time"] is None:
 				self.__args["time"] = value
 				if not self.__args["time"].isdigit():
@@ -484,7 +484,7 @@ class Validate:
 					self.__args["time"] = int(self.__args["time"])
 					if self.__args["time"] < 1:
 						self.__error("Number of months must be greater than zero")
-			# --------------------
+			# ----------------------------
 			elif key == "-tr" and self.__args["total-results"] is None:
 				self.__args["total-results"] = value
 				if not self.__args["total-results"].isdigit():
@@ -493,7 +493,7 @@ class Validate:
 					self.__args["total-results"] = int(self.__args["total-results"])
 					if self.__args["total-results"] < 1:
 						self.__error("Total number of unique results must be greater than zero")
-			# --------------------
+			# ----------------------------
 			elif key == "-pr" and self.__args["page-results"] is None:
 				self.__args["page-results"] = value
 				if not self.__args["page-results"].isdigit():
@@ -502,7 +502,7 @@ class Validate:
 					self.__args["page-results"] = int(self.__args["page-results"])
 					if self.__args["page-results"] < 1 or self.__args["page-results"] > 1000:
 						self.__error("Number of results per page must be between 1 and 1000")
-			# --------------------
+			# ----------------------------
 			elif key == "-min-q" and self.__args["minimum-queries"] is None:
 				self.__args["minimum-queries"] = value
 				if not self.__args["minimum-queries"].isdigit():
@@ -511,7 +511,7 @@ class Validate:
 					self.__args["minimum-queries"] = int(self.__args["minimum-queries"])
 					if self.__args["minimum-queries"] < 1:
 						self.__error("Minimum sleep between Google queries must be greater than zero")
-			# --------------------
+			# ----------------------------
 			elif key == "-max-q" and self.__args["maximum-queries"] is None:
 				self.__args["maximum-queries"] = value
 				if not self.__args["maximum-queries"].isdigit():
@@ -520,7 +520,7 @@ class Validate:
 					self.__args["maximum-queries"] = int(self.__args["maximum-queries"])
 					if self.__args["maximum-queries"] < 1:
 						self.__error("Maximum sleep between Google queries must be greater than zero")
-			# --------------------
+			# ----------------------------
 			elif key == "-min-p" and self.__args["minimum-pages"] is None:
 				self.__args["minimum-pages"] = value
 				if not self.__args["minimum-pages"].isdigit():
@@ -529,7 +529,7 @@ class Validate:
 					self.__args["minimum-pages"] = int(self.__args["minimum-pages"])
 					if self.__args["minimum-pages"] < 1:
 						self.__error("Minimum sleep between Google pages must be greater than zero")
-			# --------------------
+			# ----------------------------
 			elif key == "-max-p" and self.__args["maximum-pages"] is None:
 				self.__args["maximum-pages"] = value
 				if not self.__args["maximum-pages"].isdigit():
@@ -538,7 +538,7 @@ class Validate:
 					self.__args["maximum-pages"] = int(self.__args["maximum-pages"])
 					if self.__args["maximum-pages"] < 1:
 						self.__error("Maximum sleep between Google pages must be greater than zero")
-			# --------------------
+			# ----------------------------
 			elif key == "-a" and self.__args["agents"] is None:
 				self.__args["agents"] = value
 				if not os.path.isfile(self.__args["agents"]):
@@ -551,7 +551,7 @@ class Validate:
 					self.__args["agents"] = read_file(self.__args["agents"])
 					if not self.__args["agents"]:
 						self.__error("No user agents were found")
-			# --------------------
+			# ----------------------------
 			elif key == "-p" and self.__args["proxies"] is None:
 				self.__args["proxies"] = value
 				if os.path.isfile(self.__args["proxies"]):
@@ -565,12 +565,12 @@ class Validate:
 							self.__error("No proxies were found")
 				else:
 					self.__args["proxies"] = [self.__args["proxies"]]
-			# --------------------
+			# ----------------------------
 			elif key == "-d" and self.__args["directory"] is None:
 				self.__args["directory"] = value
 				if not os.path.exists(self.__args["directory"]):
 					self.__error("Downloads directory does not exists")
-			# --------------------
+			# ----------------------------
 			elif key == "-th" and self.__args["threads"] is None:
 				self.__args["threads"] = value
 				if not self.__args["threads"].isdigit():
@@ -579,20 +579,20 @@ class Validate:
 					self.__args["threads"] = int(self.__args["threads"])
 					if self.__args["threads"] < 1:
 						self.__error("Number of parallel files to download must be greater than zero")
-			# --------------------
+			# ----------------------------
 			elif key == "-o" and self.__args["out"] is None:
 				self.__args["out"] = value
-			# --------------------
+			# ----------------------------
 			elif key == "-sos" and self.__args["sleep-on-start"] is None:
 				self.__args["sleep-on-start"] = value.lower()
 				if self.__args["sleep-on-start"] != "no":
 					self.__error("Specify 'no' to disable sleep on start")
-			# --------------------
+			# ----------------------------
 			elif key == "-dbg" and self.__args["debug"] is None:
 				self.__args["debug"] = value.lower()
 				if self.__args["debug"] != "yes":
 					self.__error("Specify 'yes' to enable debug output")
-			# --------------------
+			# ----------------------------
 
 	def __check(self, argc):
 		count = 0
@@ -652,7 +652,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v5.0                                #")
+		print("#                                Chad v5.1                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")
