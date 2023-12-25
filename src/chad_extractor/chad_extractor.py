@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import datetime, time, sys, os, json, jq, regex as re, random, threading, concurrent.futures, subprocess, asyncio, signal
+import datetime, time, sys, os, json, regex as re, random, threading, concurrent.futures, subprocess, asyncio, signal, collections, copy, colorama, termcolor
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 # from playwright._impl._api_types import Error as PlaywrightError # playwright<1.40.0
 from playwright._impl._errors import Error as PlaywrightError
@@ -8,9 +8,11 @@ from nagooglesearch import nagooglesearch
 
 start = datetime.datetime.now()
 
+colorama.init(autoreset = True)
+
 # ----------------------------------------
 
-def check_directory_files(directory):
+def check_directory_files(directory): # non-recursive
 	tmp = []
 	for file in os.listdir(directory):
 		file = os.path.join(directory, file)
@@ -72,16 +74,101 @@ def jload_file(file):
 def jdump(data):
 	return json.dumps(data, indent = 4, ensure_ascii = False) if data else ""
 
-def jquery(obj, query):
+def get_timestamp(text):
+	print(("{0} - {1}").format(datetime.datetime.now().strftime("%H:%M:%S"), text))
+
+# ----------------------------------------
+
+def select(obj, key, sort = False):
 	tmp = []
-	try:
-		tmp = jq.compile(query).input(obj).all()
-	except ValueError:
-		pass
+	for entry in obj:
+		tmp.append(entry[key])
+	return unique(tmp, sort)
+
+def select_array(obj, key, sort = False):
+	tmp = []
+	for entry in obj:
+		tmp.extend(entry[key])
+	return unique(tmp, sort)
+
+def sort_by(obj, key):
+	return sorted(obj, key = lambda entry: entry[key].casefold())
+
+def group_by_url(obj, sort = False):
+	grouped = collections.defaultdict(lambda: {"files": []})
+	for entry in obj:
+		url = entry["url"]
+		grouped[url]["url"] = entry["url"]
+		if "key" in entry:
+			grouped[url]["key"] = entry["key"]
+		grouped[url]["files"].append(entry["file"])
+	tmp = []
+	for entry in list(grouped.values()):
+		entry["files"] = unique(entry["files"], sort)
+		tmp.append(entry)
 	return tmp
 
-def get_timestamp(text):
-	return print(("{0} - {1}").format(datetime.datetime.now().strftime("%H:%M:%S"), text))
+def delete(obj, key):
+	tmp = []
+	for entry in copy.deepcopy(obj):
+		entry.pop(key, None)
+		tmp.append(entry)
+	return tmp
+
+def select_results_array(obj, sort = False):
+	tmp = []
+	for entry in obj:
+		for key in entry["results"]:
+			tmp.extend(entry["results"][key])
+	return unique(tmp, sort)
+
+def select_by_file(obj, file):
+	tmp = []
+	for entry in obj:
+		if file in entry["file"]:
+			tmp.append(entry)
+	return tmp
+
+def select_url_by_file(obj, file, sort = False):
+	tmp = []
+	for entry in obj:
+		if file in entry["files"]:
+			tmp.append(entry["url"])
+	return tmp
+
+def select_by_file_delete_files(obj, file, sort = False):
+	tmp = []
+	for entry in copy.deepcopy(obj):
+		if file in entry["files"]:
+			entry.pop("files", None)
+			tmp.append(entry)
+	return tmp
+
+def jquery(obj, query, value = None, sort = False):
+	if query == "select_url":
+		return select(obj, "url", sort)
+	elif query == "select_urls":
+		return select_array(obj, "urls", sort)
+	elif query == "sort_by_url":
+		return sort_by(obj, "url")
+	elif query == "group_by_url":
+		return group_by_url(obj, sort)
+	elif query == "select_file":
+		return select(obj, "file", sort)
+	elif query == "select_files":
+		return select_array(obj, "files", sort)
+	elif query == "sort_by_file":
+		return sort_by(obj, "file")
+	elif query == "delete_files":
+		return delete(obj, "files")
+	elif query == "select_results":
+		return select_results_array(obj, sort)
+	elif query == "select_by_file":
+		return select_by_file(obj, value)
+	elif query == "select_by_file_delete_files":
+		return select_by_file_delete_files(obj, value, sort)
+	elif query == "select_url_by_file":
+		return select_url_by_file(obj, value, sort)
 
 # ----------------------------------------
 
@@ -109,67 +196,57 @@ class ChadExtractor:
 		self.__retries        = retries
 		self.__wait           = wait
 		self.__start          = 4 # delay between starting each headless browser
-		self.__agents         = agents
+		self.__agents         = agents if agents else nagooglesearch.get_all_user_agents()
 		self.__proxy          = {"server": proxy} if proxy else None
 		self.__out            = out
 		self.__extension      = extension
-		self.__verbose        = verbose
+		self.__verbose        = verbose # verbose report extension
 		self.__debug          = debug
 		self.__debug_lock     = threading.Lock()
 		# --------------------------------
 		self.__keys           = {
 			"extract": True,
+			"active" : None,
 			"data"   : {
-				"extract": {
+				"extract" : {
 					"template": "extract",
 					"success" : "extracted",
-					"failed"  : "failed_extraction",
-					"failure" : "extraction",
+					"failure" : "failed_extraction",
+					"error"   : "extraction",
 					"prepend" : "extract_prepend",
 					"append"  : "extract_append"
 				},
 				"validate": {
 					"template": "validate",
 					"success" : "validated",
-					"failed"  : "failed_validation",
-					"failure" : "validation",
+					"failure" : "failed_validation",
+					"error"   : "validation",
 					"prepend" : "validate_prepend",
 					"append"  : "validate_append"
 				}
 			}
 		}
 		self.__keys["active"] = self.__keys["data"]["extract"]
+		# --------------------------------
 		self.__data           = {
 			self.__keys["data"]["extract" ]["success"]: [],
-			self.__keys["data"]["extract" ]["failed" ]: [],
+			self.__keys["data"]["extract" ]["failure"]: [],
 			self.__keys["data"]["validate"]["success"]: [],
-			self.__keys["data"]["validate"]["failed" ]: []
+			self.__keys["data"]["validate"]["failure"]: []
 		}
 		self.__data_lock      = threading.Lock()
 		# --------------------------------
-		self.__queries        = {
-			"get_url"     : ".[].url",
-			"get_urls"    : ".[].urls[]",
-			"sort_by_url" : "sort_by(.url | ascii_downcase)[]",
-			"group_by_url": "group_by(.url) | map((.[0] | del(.file)) + {files: (map(.file) | unique)})[]",
-			"get_file"    : ".[].file",
-			"get_files"   : ".[].files[]",
-			"sort_by_file": "sort_by(.file | ascii_downcase)[]",
-			"delete_files": ".[] | del(.files)",
-			"get_results" : ".[].results[][]"
-		}
 		self.__flags          = re.MULTILINE | re.IGNORECASE
-		# --------------------------------
 		self.__close          = False
 
 	def set_validate(self):
 		self.__keys["extract"] = False
 		self.__keys["active" ] = self.__keys["data"]["validate"]
 
-	def __extend_data(self, succeeded, failed):
+	def __extend_data(self, success, failure):
 		with self.__data_lock:
-			self.__data[self.__keys["active"]["success"]].extend(succeeded)
-			self.__data[self.__keys["active"]["failure"]].extend(failed)
+			self.__data[self.__keys["active"]["success"]].extend(success)
+			self.__data[self.__keys["active"]["failure"]].extend(failure)
 
 	def parse_template(self):
 		tmp = {}
@@ -184,26 +261,39 @@ class ChadExtractor:
 		if self.__keys["extract"]:
 			if not plaintext:
 				for file in self.__results:
-					for url in jquery(jload_file(file), self.__queries["get_urls"]):
-						tmp.append({"file": file, "url": url})
+					for url in jquery(jload_file(file), "select_urls"):
+						tmp.append(self.__input(url, None, file))
 			else:
 				for file in self.__results:
 					results = self.__parse_response(None, read_file(file, array = False)) # plaintext files are treated like server responses
 					if results:
-						self.__data[self.__keys["data"]["extract"]["success"]].append({"file": file, "results": results})
-						for key in results:
-							if key in self.__template:
-								for url in results[key]:
-									tmp.append({"file": file, "url": url, "id": key})
+						self.__data[self.__keys["data"]["extract"]["success"]].append(self.__output_plaintext(file, results))
+				return bool(self.__data[self.__keys["data"]["extract"]["success"]])
 		else:
-			for entry in self.__data[self.__keys["data"]["extract"]["success"]]:
-				for key in entry["results"]:
-					if key in self.__template:
-						for url in entry["results"][key]:
-							for file in entry["files"]:
-								tmp.append({"file": file, "url": url, "id": key})
-		self.__results = jquery(tmp, self.__queries["group_by_url"])
+			if not plaintext:
+				for entry in self.__data[self.__keys["data"]["extract"]["success"]]:
+					for key in entry["results"]:
+						if key in self.__template:
+							for url in entry["results"][key]:
+								for file in entry["files"]:
+									tmp.append(self.__input(url, key, file))
+			else:
+				for entry in self.__data[self.__keys["data"]["extract"]["success"]]:
+					for key in entry["results"]:
+						if key in self.__template:
+							for url in entry["results"][key]:
+								tmp.append(self.__input(url, key, entry["file"]))
+		self.__results = jquery(tmp, "group_by_url")
 		return bool(self.__results)
+
+	def __input(self, url, key, file):
+		return {"url": url, "key": key, "file": file}
+
+	def __output(self, url, results, files):
+		return {"url": url, "results": results, "files": files}
+
+	def __output_plaintext(self, file, results):
+		return {"file": file, "results": results}
 
 	def __parse_response(self, record, response):
 		tmp = {}
@@ -216,10 +306,10 @@ class ChadExtractor:
 					matches = re.findall(self.__template[key][self.__keys["data"]["extract"]["template"]], response, flags = self.__flags)
 					if matches:
 						tmp[key] = self.__concat(key, matches)
-			elif re.search(self.__template[record["id"]][self.__keys["data"]["validate"]["template"]], response, flags = self.__flags):
+			elif re.search(self.__template[record["key"]][self.__keys["data"]["validate"]["template"]], response, flags = self.__flags):
 				tmp = True
 		except (re.error, KeyError) as ex:
-			self.__print_ex(ex)
+			self.__print_error(ex)
 		return tmp
 
 	def __concat(self, key, matches):
@@ -231,27 +321,31 @@ class ChadExtractor:
 			append = self.__template[key][self.__keys["data"]["extract"]["append"]]
 		if prepend or append:
 			for i in range(len(matches)):
-				matches[i] = prepend + matches[i] + append
+				matches[i] = ("{0}{1}{2}").format(prepend, matches[i], append)
 		return unique(matches, sort = True)
 
 	def run(self):
 		signal.signal(signal.SIGINT, self.__interrupt)
 		self.__close = False
-		get_timestamp(("Number of URLs to be {0}: {1}").format(self.__keys["active"]["success"], len(self.__results)))
+		get_timestamp(("Number of URLs to {0}: {1}").format(self.__keys["active"]["template"], len(self.__results)))
 		print("Press CTRL + C to exit early - results will be saved")
 		random.shuffle(self.__results) # anti-bot evasion 1
 		with concurrent.futures.ThreadPoolExecutor(max_workers = self.__threads) as executor:
 			subprocesses = []
 			for records in self.__split_results():
+				if self.__close:
+					break
 				if subprocesses:
 					time.sleep(self.__start)
 				subprocesses.append(executor.submit(self.__proxy_browser_requests, records, len(subprocesses) + 1))
 			concurrent.futures.wait(subprocesses)
+		if not self.__keys["extract"]:
+			signal.signal(signal.SIGINT, signal.SIG_DFL)
 		return bool(self.__data[self.__keys["active"]["success"]])
 
 	def __interrupt(self, signum, frame):
 		self.__close = True
-		self.__print_msg("Please wait for a clean exit...")
+		self.__print_lock("Please wait for a clean exit...")
 
 	def __split_results(self):
 		if self.__threads > 1:
@@ -262,27 +356,31 @@ class ChadExtractor:
 
 	def __proxy_browser_requests(self, records, identifier):
 		if not self.__close:
-			self.__print_debug("Starting browser thread", identifier)
+			self.__print_lock(("Running browser thread #{0}").format(identifier))
 			asyncio.run(self.__browser_requests(records))
 
 	async def __browser_requests(self, records):
-		succeeded = []
-		failed    = []
-		pw        = None
-		browser   = None
-		context   = None
+		success = []
+		failure = []
+		pw      = None
+		browser = None
+		context = None
+		# --------------------------------
 		try:
 			pw      = await async_playwright().start()
 			browser = await pw.chromium.launch(
 				headless      = True,
-				handle_sigint = False, # do not terminate the browser on CTRL + C
+				handle_sigint = False, # do not terminate the browser on 'CTRL + C'
 				proxy         = self.__proxy
 			)
 			context = await self.__set_context(browser)
-			# context.set_default_timeout(60000) # default: 30s
+			context.set_default_timeout(30000)
+			# ----------------------------
 			cache_reset = 0
 			cache_limit = 100
 			for record in records:
+				if self.__close:
+					break
 				# playwright issue / bug
 				# reusing same context leads to large resource consumption and crash
 				cache_reset += 1
@@ -290,32 +388,32 @@ class ChadExtractor:
 					cache_reset = 0
 					await context.close()
 					context = await self.__set_context(browser)
-				entry = {"files": record["files"], "url": record["url"], "results": {}}
-				count = self.__retries + 1
-				while count > 0 and not self.__close:
+				# ------------------------
+				entry   = self.__output(record["url"], None, record["files"])
+				retries = self.__retries + 1
+				while retries > 0 and not self.__close:
 					await context.set_extra_http_headers(self.__get_headers()) # anti-bot evasion 2
 					# --------------------
 					tmp = await self.__page_get(context, record["url"])
 					if tmp["error"]:
 						tmp = await self.__request_get(context, record["url"])
 						if tmp["error"]:
-							count = 0
+							retries = 0
 					# --------------------
 					if tmp["error"] or not tmp["response"]:
-						count -= 1
-						if count < 1:
-							failed.append(entry)
+						retries -= 1
+						if retries < 1:
+							failure.append(entry)
 					else:
-						count = 0
+						retries = 0
 						entry["results"] = self.__parse_response(record, tmp["response"])
 						if entry["results"]:
-							succeeded.append(entry)
+							success.append(entry)
 					# --------------------
 					await context.clear_cookies() # anti-bot evasion 3
-				if self.__close:
-					break
+					# --------------------
 		except (PlaywrightError, Exception) as ex:
-			self.__print_ex(ex)
+			self.__print_error(ex)
 		finally:
 			if context:
 				await context.close()
@@ -323,7 +421,7 @@ class ChadExtractor:
 				await browser.close()
 			if pw:
 				await pw.stop()
-		self.__extend_data(succeeded, failed)
+		self.__extend_data(success, failure)
 
 	async def __set_context(self, browser):
 		return await browser.new_context(
@@ -344,7 +442,7 @@ class ChadExtractor:
 		}
 
 	def __get_user_agent(self):
-		return self.__agents[random.randint(0, len(self.__agents) - 1)] if self.__agents else nagooglesearch.get_random_user_agent()
+		return self.__agents[random.randint(0, len(self.__agents) - 1)]
 
 	async def __page_get(self, context, url):
 		tmp = {"response": None, "error": False}
@@ -361,12 +459,12 @@ class ChadExtractor:
 			except PlaywrightTimeoutError: # live streams will always timeout
 				pass
 			tmp["response"] = await page.content()
-			self.__print_debug(response.status, url)
+			self.__print_status(response.status, url)
 		except PlaywrightTimeoutError:
 			pass
-		except (PlaywrightError, Exception) as ex: # break and fallback in case of request timeout, invalid domain, or file download
+		except (PlaywrightError, Exception) as ex: # break and fallback in case of invalid domain or file access
 			tmp["error"] = True
-			self.__print_ex(ex)
+			self.__print_error(ex)
 		finally:
 			if page:
 				await page.close()
@@ -384,97 +482,98 @@ class ChadExtractor:
 			response = await context.request.get(url)
 			body = await response.body()
 			tmp["response"] = body.decode(encoding)
-			self.__print_debug(response.status, url)
+			self.__print_status(response.status, url)
 		except PlaywrightTimeoutError:
 			pass
 		except (PlaywrightError, Exception) as ex: # break in case of request timeout or invalid domain
 			tmp["error"] = True
-			self.__print_ex(ex)
+			self.__print_error(ex)
 		return tmp
 
-	def __print_debug(self, key, value):
+	def __print_status(self, key, value):
 		if self.__debug:
 			with self.__debug_lock:
-				print(("{0}: {1}").format(key, value))
+				termcolor.cprint(("{0}: {1}").format(key, value), "yellow")
 
-	def __print_ex(self, ex):
+	def __print_error(self, error):
 		if self.__debug:
 			with self.__debug_lock:
-				print(ex)
+				termcolor.cprint(error, "red")
 
-	def __print_msg(self, msg):
+	def __print_lock(self, text):
 		with self.__debug_lock:
-			print(msg)
+			print(text)
 
 	def save_results(self, plaintext = False):
-		extracted          = self.__keys["data"]["extract" ]["success"]
-		failed_extraction  = self.__keys["data"]["extract" ]["failed" ]
-		failure_extraction = self.__keys["data"]["extract" ]["failure"]
-		validated          = self.__keys["data"]["validate"]["success"]
-		failed_validation  = self.__keys["data"]["validate"]["failed" ]
-		failure_validation = self.__keys["data"]["validate"]["failure"]
-		tmp                = self.__get_report(plaintext)
+		extracted         = self.__keys["data"]["extract" ]["success"]
+		failed_extraction = self.__keys["data"]["extract" ]["failure"]
+		extract_error     = self.__keys["data"]["extract" ]["error"  ]
+		validated         = self.__keys["data"]["validate"]["success"]
+		failed_validation = self.__keys["data"]["validate"]["failure"]
+		validate_error    = self.__keys["data"]["validate"]["error"  ]
+		tmp               = self.__get_report(plaintext)
 		# --------------------------------
-		self.__data[extracted]    = jquery(self.__data[extracted], self.__queries["sort_by_file" if plaintext else "sort_by_url"])
-		tmp["full"   ]            = self.__data[extracted] if plaintext else jquery(self.__data[extracted], self.__queries["delete_files"])
-		tmp["summary"][extracted] = unique(jquery(tmp["full"], self.__queries["get_results"]), sort = True)
+		self.__data[extracted]    = jquery(self.__data[extracted], "sort_by_file" if plaintext else "sort_by_url")
+		tmp["full"   ]            = self.__data[extracted] if plaintext else jquery(self.__data[extracted], "delete_files")
+		tmp["summary"][extracted] = unique(jquery(tmp["full"], "select_results"), sort = True)
 		# --------------------------------
 		if not plaintext:
-			self.__data[failed_extraction]    = jquery(self.__data[failed_extraction], self.__queries["sort_by_url"])
-			tmp["failed"][failure_extraction] = jquery(self.__data[failed_extraction], self.__queries["get_url"])
+			self.__data[failed_extraction] = jquery(self.__data[failed_extraction], "sort_by_url")
+			tmp["failed"][extract_error]   = jquery(self.__data[failed_extraction], "select_url")
 		# --------------------------------
-		self.__data[validated]    = jquery(self.__data[validated], self.__queries["sort_by_url"])
-		tmp["summary"][validated] = jquery(self.__data[validated], self.__queries["get_url"])
+		self.__data[validated]    = jquery(self.__data[validated], "sort_by_url")
+		tmp["summary"][validated] = jquery(self.__data[validated], "select_url")
 		# --------------------------------
-		self.__data[failed_validation]    = jquery(self.__data[failed_validation], self.__queries["sort_by_url"])
-		tmp["failed"][failure_validation] = jquery(self.__data[failed_validation], self.__queries["get_url"])
+		self.__data[failed_validation] = jquery(self.__data[failed_validation], "sort_by_url")
+		tmp["failed"][validate_error]  = jquery(self.__data[failed_validation], "select_url")
 		# --------------------------------
 		write_file(jdump(tmp), self.__out)
 		# --------------------------------
 		if self.__verbose:
-			for file in unique(jquery(self.__data[extracted], self.__queries["get_file" if plaintext else "get_files"])):
+			for file in jquery(self.__data[extracted], "select_file" if plaintext else "select_files"):
 				# ------------------------
 				tmp = self.__get_report(plaintext, main = False)
 				# ------------------------
 				if not plaintext:
-					tmp["full"   ]              = jquery(self.__data[extracted], (".[] | select(.files | index(\"{0}\")) | del(.files)").format(file))
-					tmp["summary"]["extracted"] = unique(jquery(tmp["full"], self.__queries["get_results"]), sort = True)
+					tmp["full"   ]              = jquery(self.__data[extracted], "select_by_file_delete_files", file)
+					tmp["summary"]["extracted"] = jquery(tmp["full"], "select_results", sort = True)
 				else:
-					obj                         = jquery(self.__data[extracted], (".[] | select(.file == \"{0}\") | del(.file)").format(file))
-					tmp["summary"]["extracted"] = unique(jquery(obj, self.__queries["get_results"]), sort = True)
+					obj                         = jquery(self.__data[extracted], "select_by_file", file)
+					tmp["summary"]["extracted"] = jquery(obj, "select_results", sort = True)
 					tmp["results"]              = obj[0]["results"]
 				# ------------------------
-				query = (".[] | select(.files | index(\"{0}\")) | .url").format(file)
-				# ------------------------
 				if not plaintext:
-					tmp["failed"][failure_extraction] = jquery(self.__data[failed_extraction], query)
+					tmp["failed"][extract_error] = jquery(self.__data[failed_extraction], "select_url_by_file", file)
 				# ------------------------
-				tmp["summary"][validated] = jquery(self.__data[validated], query)
+				tmp["summary"][validated] = jquery(self.__data[validated], "select_url_by_file", file)
 				# ------------------------
-				tmp["failed"][failure_validation] = jquery(self.__data[failed_validation], query)
+				tmp["failed"][validate_error] = jquery(self.__data[failed_validation], "select_url_by_file", file)
 				# ------------------------
 				write_file_silent(jdump(tmp), file.rsplit(".", 1)[0] + self.__extension)
 				# ------------------------
 
 	def __get_report(self, plaintext = False, main = True):
-		extracted          = self.__keys["data"]["extract" ]["success"]
-		failure_extraction = self.__keys["data"]["extract" ]["failure"]
-		validated          = self.__keys["data"]["validate"]["success"]
-		failure_validation = self.__keys["data"]["validate"]["failure"]
+		extracted      = self.__keys["data"]["extract" ]["success"]
+		extract_error  = self.__keys["data"]["extract" ]["error"  ]
+		validated      = self.__keys["data"]["validate"]["success"]
+		validate_error = self.__keys["data"]["validate"]["error"  ]
 		# --------------------------------
-		tmp = {}
-		tmp["started_at"] = start.strftime("%Y-%m-%d %H:%M:%S")
-		tmp["summary"] = {}
-		tmp["summary"][validated] = []
-		tmp["summary"][extracted] = []
-		tmp["failed"] = {}
-		tmp["failed"][failure_validation] = []
-		tmp["full"] = {}
+		tmp = {
+			"started_at": start.strftime("%Y-%m-%d %H:%M:%S"),
+			"summary": {
+				validated: [],
+				extracted: []
+			},
+			"failed": {
+				validate_error: []
+			},
+			"full": {}
+		}
 		if not plaintext:
-			tmp["failed"][failure_extraction] = []
+			tmp["failed"][extract_error] = []
 		elif not main:
-			tmp["results"] = {}
 			tmp.pop("full")
+			tmp["results"] = {}
 		return tmp
 
 # ----------------------------------------
@@ -503,7 +602,7 @@ class Validate:
 
 	def __basic(self):
 		self.__proceed = False
-		print("Chad Extractor v5.1 ( github.com/ivan-sincek/chad )")
+		print("Chad Extractor v5.2 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad-extractor -t template      -res results -o out                 [-th threads] [-r retries] [-w wait] [-a agents         ]")
 		print("Example: chad-extractor -t template.json -res results -o results_report.json [-th 10     ] [-r 5      ] [-w 10  ] [-a user_agents.txt]")
@@ -739,7 +838,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                           Chad Extractor v5.1                           #")
+		print("#                           Chad Extractor v5.2                           #")
 		print("#                                   by Ivan Sincek                        #")
 		print("#                                                                         #")
 		print("# Extract and validate data from Chad results.                            #")
@@ -770,6 +869,8 @@ def main():
 				chad_extractor.set_validate()
 				if not chad_extractor.parse_template():
 					print("No validation entries were found in the template file")
+				elif not chad_extractor.parse_input(plaintext = True):
+					print("No results for data validation were found")
 				elif not chad_extractor.run():
 					print("No data matched the validation criteria")
 				chad_extractor.save_results(plaintext = True)

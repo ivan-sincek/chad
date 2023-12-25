@@ -2,15 +2,9 @@
 
 Search Google Dorks like Chad. Based on [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch).
 
-At the moment, this tool cannot be installed on Windows OS because Python's `jq` library (required by Chad Extractor) is not supported. Although, [Chad](https://github.com/ivan-sincek/chad/blob/main/src/chad/chad.py) does in fact work on Windows OS if you run it as a standalone script.
-
 Tested on Kali Linux v2023.4 (64-bit).
 
 Made for educational purposes. I hope it will help!
-
-Future plans:
-
-* find `jq` alternative so that the whole package can be cross-platform.
 
 ## Table of Contents
 
@@ -48,7 +42,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-5.1-py3-none-any.whl
+python3 -m pip install dist/google_chad-5.2-py3-none-any.whl
 
 playwright install chromium
 ```
@@ -75,13 +69,13 @@ Chad's file download feature is based on Python Requests library.
 
 ## Chad Extractor
 
-Chad Extractor is a powerful tool based on [Playwright](https://playwright.dev/python) Chromium headless browser created to efficiently scrape web; in other words, to compensate for Python Requests library which cannot render JavaScript encoded HTML and is easily blocked by anti-bot solutions.
+Chad Extractor is a powerful tool based on [Playwright's](https://playwright.dev/python) Chromium headless browser created to efficiently scrape web; in other words, to compensate for Python Requests library which cannot render JavaScript encoded HTML and is easily blocked by anti-bot solutions.
 
-There is a 4 seconds delay between starting each headless browser; otherwise, it would be very resources-intensive.
+There is a built-in 4 seconds delay between starting each headless browser; otherwise, it would be very resources-intensive.
 
 ### Extracting and Validating Data
 
-Chad Extractor was mainly designed to extract and validate data from Chad results; but, you can also use it to extract and validate data from plaintext files by specifying `-pt yes` flag - plaintext files will be treated like server responses and extraction logic will be immediately applied.
+Chad Extractor was mainly designed to extract and validate data from Chad results; but, you can also use it to extract and validate data from plaintext files by specifying `-pt yes` option - plaintext files will be treated like server responses and extraction logic will be immediately applied.
 
 ## Advanced Example: Social Media Takover
 
@@ -173,7 +167,7 @@ Manually check if social media URLs in `summary --> validated` are available for
 
 ```json
 {
-   "started_at":"2023-12-24 03:30:10",
+   "started_at":"2023-12-23 03:30:10",
    "summary":{
       "validated":[
          "https://t.me/does_not_exist"
@@ -214,7 +208,7 @@ Prepare sites/domains/subdomains as `sites.txt` file:
 *.example.com -www
 ```
 
-Prepare bot-safe user agents as `user_agents.txt` file, where `<your-api-key>` is your API key from [scrapeops.io](https://scrapeops.io):
+\[Optional\] Prepare bot-safe user agents as `user_agents.txt` file, where `<your-api-key>` is your API key from [scrapeops.io](https://scrapeops.io):
 
 ```python
 python3 -c 'import json, requests; open("user_agents.txt", "w").write(("\n").join(requests.get("http://headers.scrapeops.io/v1/user-agents?api_key=<your-api-key>&num_results=100", verify = False).json()["result"]))'
@@ -234,7 +228,7 @@ chad-extractor -t social_media_template.json -res results -a user_agents.txt -o 
 
 Google's cooling-off period can be from a few hours to a whole day.
 
-To avoid hitting Google's rate limit with Chad, increase the minimum and maximum sleep between Google queries and/or pages; or use proxies \([1](https://geonode.com/free-proxy-list)\)\([2](https://proxyscrape.com/home)\), although, free proxies are not always stable.
+To avoid hitting Google's rate limit with Chad, increase the minimum and maximum sleep between Google queries and/or pages; or use proxies \([1](https://geonode.com/free-proxy-list)\)\([2](https://proxyscrape.com/home)\), although, free proxies are not always stable and often blocked.
 
 To download a list of free proxies, run:
 
@@ -242,12 +236,12 @@ To download a list of free proxies, run:
 curl -s 'https://proxylist.geonode.com/api/proxy-list?limit=50&page=1&sort_by=lastChecked&sort_type=desc' -H 'Referer: https://proxylist.geonode.com/' | jq -r '.data[] | "\(.protocols[])://\(.ip):\(.port)"' > proxies.txt
 ```
 
-Additionally, to avoid hitting e.g. Instagram's rate limit with Chad Extractor, you might want to isolate it in a separate run, increase the wait time, and use only one thread.
+Additionally, to avoid hitting e.g. [Instagram's](https://www.instagram.com) rate limit with Chad Extractor, you might want to isolate it in a separate run, increase the wait time, and use only one thread.
 
 ## Usage
 
 ```fundamental
-Chad v5.1 ( github.com/ivan-sincek/chad )
+Chad v5.2 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-a agents         ] [-p proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-a user_agents.txt] [-p proxies.txt] [-o results.json]
@@ -314,7 +308,7 @@ DEBUG
 ```
 
 ```fundamental
-Chad Extractor v5.1 ( github.com/ivan-sincek/chad )
+Chad Extractor v5.2 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results -o out                 [-th threads] [-r retries] [-w wait] [-a agents         ]
 Example: chad-extractor -t template.json -res results -o results_report.json [-th 10     ] [-r 5      ] [-w 10  ] [-a user_agents.txt]

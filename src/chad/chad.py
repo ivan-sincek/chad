@@ -378,7 +378,7 @@ class Validate:
 
 	def __basic(self):
 		self.__proceed = False
-		print("Chad v5.1 ( github.com/ivan-sincek/chad )")
+		print("Chad v5.2 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-a agents         ] [-p proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-a user_agents.txt] [-p proxies.txt] [-o results.json]")
@@ -652,7 +652,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v5.1                                #")
+		print("#                                Chad v5.2                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")

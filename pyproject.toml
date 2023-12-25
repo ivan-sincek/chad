@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "google-chad"
-version = "5.1"
+version = "5.2"
 authors = [{ name = "Ivan Sincek" }]
 description = "Not another Google Dorking tool."
 readme = "README.md"
@@ -12,9 +12,9 @@ requires-python = ">=3.6"
 classifiers = [
 	"Programming Language :: Python :: 3",
 	"License :: OSI Approved :: MIT License",
-	"Operating System :: POSIX :: Linux"
+	"Operating System :: OS Independent"
 ]
-dependencies = ["datetime>=5.0", "termcolor>=1.1.0", "colorama>=0.4.6", "nagooglesearch>=6.8", "requests>=2.27.1", "asyncio>=3.4.3", "playwright>=1.40.0", "regex>=2022.4.24", "jq>=1.2.1"]
+dependencies = ["datetime>=5.0", "termcolor>=1.1.0", "colorama>=0.4.6", "nagooglesearch>=6.9", "requests>=2.27.1", "asyncio>=3.4.3", "playwright>=1.40.0", "regex>=2022.4.24"]
 
 [project.urls]
 "Homepage" = "https://github.com/ivan-sincek/chad"
