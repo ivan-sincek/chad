@@ -215,11 +215,11 @@ python3 -c 'import json, requests; open("user_agents.txt", "w").write(("\n").joi
 Automate:
 
 ```bash
-mkdir results
+mkdir chad_results
 
-IFS=$'\n'; count=0; for site in $(cat sites.txt); do count=$((count+1)); echo "#${count} | ${site}"; chad -q social_media_dorks.txt -s "${site}" -tr 200 -a user_agents.txt -o "results/results_${count}.json"; done
+IFS=$'\n'; count=0; for site in $(cat sites.txt); do count=$((count+1)); echo "#${count} | ${site}"; chad -q social_media_dorks.txt -s "${site}" -tr 200 -a user_agents.txt -o "chad_results/results_${count}.json"; done
 
-chad-extractor -t social_media_template.json -res results -a user_agents.txt -o results_report.json -v
+chad-extractor -t social_media_template.json -res chad_results -a user_agents.txt -o results_report.json -v
 ```
 
 ## Rate Limiting
