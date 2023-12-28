@@ -1,0 +1,48 @@
+{
+   "telegram":{
+      "extract":"t\\.me\\/(?:(?!(?:share)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"<meta property=\"og:title\" content=\"Telegram: Contact .+?\">"
+   },
+   "discord":{
+      "extract":"discord\\.(?:com|gg)\\/invite\\/[\\w\\d\\.\\_\\-\\+\\@]+(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"Invite Invalid"
+   },
+   "youtube":{
+      "extract":"youtube\\.com\\/(?:c|channel)\\/[\\w\\d\\.\\_\\-\\+\\@]+(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"This page isn't available\\."
+   },
+   "twitter":{
+      "extract":"(?<!pic\\.)twitter\\.com\\/(?:(?!(?:explore|hashtag|home|i|intent|personalization|search|share|tos|widgets\\.js|[\\w]+\\/(?:privacy|tos))(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"This account doesn.?t exist"
+   },
+   "facebook":{
+      "extract":"facebook\\.com\\/(?:(?!(?:about|dialog|gaming|groups|sharer|share\\.php|terms\\.php)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"This page isn't available"
+   },
+   "instagram":{
+      "extract":"instagram\\.com\\/(?:(?!(?:about|accounts|ar|explore|p)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "extract_append":"/",
+      "validate":"Sorry, this page isn't available\\."
+   },
+   "tiktok":{
+      "extract":"(?<!vt\\.)tiktok\\.com\\/\\@[\\w\\d\\.\\_\\-\\+\\@]+(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"<title.*> \\| TikTok<\\/title>"
+   },
+   "linkedin-company":{
+      "extract":"linkedin\\.com\\/company\\/[\\w\\d\\.\\_\\-\\+\\@\\&]+(?<!\\.)",
+      "extract_prepend":"https://hr.",
+      "validate":"Page not found"
+   },
+   "linkedin-user":{
+      "extract":"linkedin\\.com\\/in\\/[\\w\\d\\.\\_\\-\\+\\@\\&]+(?<!\\.)",
+      "extract_prepend":"https://hr.",
+      "validate":"An exact match for .+ could not be found\\."
+   }
+}

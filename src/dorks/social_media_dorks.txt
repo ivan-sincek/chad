@@ -1,0 +1,8 @@
+intext:"t.me/"
+intext:"discord.com/invite/" OR intext:"discord.gg/invite/"
+intext:"youtube.com/c/" OR intext:"youtube.com/channel/"
+intext:"twitter.com/"
+intext:"facebook.com/"
+intext:"instagram.com/"
+intext:"tiktok.com/"
+intext:"linkedin.com/in/" OR intext:"linkedin.com/company/"
