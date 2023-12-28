@@ -78,24 +78,24 @@ def get_timestamp(text, color = None):
 
 class Chad:
 
-	def __init__(self, queries, site, time, total_results, page_results, minimum_queries, maximum_queries, minimum_pages, maximum_pages, user_agents, proxies, threads, sleep_on_start, debug):
-		self.__queries         = queries
-		self.__site            = site
-		self.__tbs             = self.__init_tbs(time)
-		self.__total_results   = total_results
-		self.__page_results    = page_results
-		self.__minimum_queries = minimum_queries
-		self.__maximum_queries = maximum_queries
-		self.__minimum_pages   = minimum_pages
-		self.__maximum_pages   = maximum_pages
-		self.__user_agents     = user_agents if user_agents else nagooglesearch.get_all_user_agents()
-		self.__user_agents_len = len(self.__user_agents)
-		self.__proxies         = Proxies(proxies)
-		self.__threads         = threads
-		self.__sleep_on_start  = sleep_on_start
-		self.__debug           = debug
-		self.__blacklist       = self.__init_blacklist()
-		self.__flags           = re.MULTILINE | re.IGNORECASE
+	def __init__(self, queries, site, time, total_results, page_results, minimum_queries, maximum_queries, minimum_pages, maximum_pages, user_agents, proxies, threads, no_sleep_on_start, debug):
+		self.__queries           = queries
+		self.__site              = site
+		self.__tbs               = self.__init_tbs(time)
+		self.__total_results     = total_results
+		self.__page_results      = page_results
+		self.__minimum_queries   = minimum_queries
+		self.__maximum_queries   = maximum_queries
+		self.__minimum_pages     = minimum_pages
+		self.__maximum_pages     = maximum_pages
+		self.__user_agents       = user_agents if user_agents else nagooglesearch.get_all_user_agents()
+		self.__user_agents_len   = len(self.__user_agents)
+		self.__proxies           = Proxies(proxies)
+		self.__threads           = threads
+		self.__no_sleep_on_start = no_sleep_on_start
+		self.__debug             = debug
+		self.__blacklist         = self.__init_blacklist()
+		self.__flags             = re.MULTILINE | re.IGNORECASE
 
 	def __init_tbs(self, time):
 		tmp = "li:1"
@@ -150,7 +150,7 @@ class Chad:
 		count = 0
 		exit_program = False
 		try:
-			if not self.__sleep_on_start:
+			if not self.__no_sleep_on_start:
 				self.__wait()
 			for query in self.__queries:
 				count += 1
@@ -343,7 +343,7 @@ class Progress:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad v5.4 ( github.com/ivan-sincek/chad )")
+		print("Chad v5.5 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]")
@@ -401,16 +401,16 @@ class MyArgParser(argparse.ArgumentParser):
 		print("OUT")
 		print("    Output file")
 		print("    -o, --out = results.json | etc.")
-		print("SLEEP ON START")
+		print("NO SLEEP ON START")
 		print("    Safety feature to prevent accidental rate limit triggering")
-		print("    -sos, --sleep-on-start")
+		print("    -nsos, --no-sleep-on-start")
 		print("DEBUG")
 		print("    Debug output")
 		print("    -dbg, --debug")
 
 	def error(self, message):
 		if len(sys.argv) > 1:
-			print("Missing a mandatory option (-q) and/or optional (-s, -t, -tr, -pr, -min-q, -max-q, -min-p, -max-p, -a, -x, -dir, -th, -o, -sos, -dbg)")
+			print("Missing a mandatory option (-q) and/or optional (-s, -t, -tr, -pr, -min-q, -max-q, -min-p, -max-p, -a, -x, -dir, -th, -o, -nsos, -dbg)")
 			print("Use -h or --help for more info")
 		else:
 			self.print_help()
@@ -421,22 +421,22 @@ class Validate:
 	def __init__(self):
 		self.__proceed = True
 		self.__parser  = MyArgParser()
-		self.__parser.add_argument("-q"    , "--queries"        , required = True , type   = str         , default = ""   )
-		self.__parser.add_argument("-s"    , "--site"           , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-t"    , "--time"           , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-tr"   , "--total-results"  , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-pr"   , "--page-results"   , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-min-q", "--minimum-queries", required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-max-q", "--maximum-queries", required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-min-p", "--minimum-pages"  , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-max-p", "--maximum-pages"  , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-a"    , "--user-agents"    , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-x"    , "--proxies"        , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-dir"  , "--directory"      , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-th"   , "--threads"        , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-o"    , "--out"            , required = False, type   = str         , default = ""   )
-		self.__parser.add_argument("-sos"  , "--sleep-on-start" , required = False, action = "store_true", default = False)
-		self.__parser.add_argument("-dbg"  , "--debug"          , required = False, action = "store_true", default = False)
+		self.__parser.add_argument("-q"    , "--queries"          , required = True , type   = str         , default = ""   )
+		self.__parser.add_argument("-s"    , "--site"             , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-t"    , "--time"             , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-tr"   , "--total-results"    , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-pr"   , "--page-results"     , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-min-q", "--minimum-queries"  , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-max-q", "--maximum-queries"  , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-min-p", "--minimum-pages"    , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-max-p", "--maximum-pages"    , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-a"    , "--user-agents"      , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-x"    , "--proxies"          , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-dir"  , "--directory"        , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-th"   , "--threads"          , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-o"    , "--out"              , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-nsos" , "--no-sleep-on-start", required = False, action = "store_true", default = False)
+		self.__parser.add_argument("-dbg"  , "--debug"            , required = False, action = "store_true", default = False)
 
 	def run(self):
 		self.__args                 = self.__parser.parse_args()
@@ -562,7 +562,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v5.4                                #")
+		print("#                                Chad v5.5                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")
@@ -585,7 +585,7 @@ def main():
 			validate.get_arg("user_agents"),
 			validate.get_arg("proxies"),
 			validate.get_arg("threads"),
-			validate.get_arg("sleep_on_start"),
+			validate.get_arg("no_sleep_on_start"),
 			validate.get_arg("debug")
 		)
 		chad.validate_queries()

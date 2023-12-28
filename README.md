@@ -40,7 +40,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-5.4-py3-none-any.whl
+python3 -m pip install dist/google_chad-5.5-py3-none-any.whl
 
 playwright install chromium
 ```
@@ -239,7 +239,7 @@ Additionally, to avoid hitting e.g. [Instagram's](https://www.instagram.com) rat
 ## Usage
 
 ```fundamental
-Chad v5.4 ( github.com/ivan-sincek/chad )
+Chad v5.5 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]
@@ -297,16 +297,16 @@ THREADS
 OUT
     Output file
     -o, --out = results.json | etc.
-SLEEP ON START
+NO SLEEP ON START
     Safety feature to prevent accidental rate limit triggering
-    -sos, --sleep-on-start
+    -nsos, --no-sleep-on-start
 DEBUG
     Debug output
     -dbg, --debug
 ```
 
 ```fundamental
-Chad Extractor v5.4 ( github.com/ivan-sincek/chad )
+Chad Extractor v5.5 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results      -o out                 [-th threads] [-r retries] [-w wait]
 Example: chad-extractor -t template.json -res chad_results -o results_report.json [-th 10     ] [-r 5      ] [-w 10  ]
