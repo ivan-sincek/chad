@@ -53,7 +53,6 @@ def __read_file_array(file, sort = False):
 			line = line.strip()
 			if line:
 				tmp.append(line)
-	stream.close()
 	return unique(tmp, sort)
 
 def __read_file_text(file):
