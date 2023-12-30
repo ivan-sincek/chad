@@ -343,7 +343,7 @@ class Progress:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad v5.5 ( github.com/ivan-sincek/chad )")
+		print("Chad v5.6 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]")
@@ -541,7 +541,7 @@ class Validate:
 				if not tmp:
 					self.__error("No proxies were found")
 		else:
-			tmp.append(value)
+			tmp = [value]
 		return tmp
 
 	def __parse_directory(self, value):
@@ -562,7 +562,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v5.5                                #")
+		print("#                                Chad v5.6                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")

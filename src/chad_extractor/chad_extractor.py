@@ -581,7 +581,7 @@ class ChadExtractor:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad Extractor v5.5 ( github.com/ivan-sincek/chad )")
+		print("Chad Extractor v5.6 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad-extractor -t template      -res results      -o out                 [-th threads] [-r retries] [-w wait]")
 		print("Example: chad-extractor -t template.json -res chad_results -o results_report.json [-th 10     ] [-r 5      ] [-w 10  ]")
@@ -714,7 +714,7 @@ class Validate:
 			elif not os.stat(value).st_size > 0:
 				self.__error("Chad results or plaintext file is empty")
 			else:
-				tmp.append(value)
+				tmp = [value]
 		return tmp
 
 	def __parse_regexes(self, values):
@@ -741,7 +741,7 @@ class Validate:
 				else:
 					tmp = self.__parse_regexes(tmp)
 		else:
-			tmp.append(self.__parse_regexes(value))
+			tmp = self.__parse_regexes(value)
 		return tmp
 
 	def __parse_greater_than(self, value, minimum, maximum, error_numeric, error_scope):
@@ -804,7 +804,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                           Chad Extractor v5.5                           #")
+		print("#                           Chad Extractor v5.6                           #")
 		print("#                                   by Ivan Sincek                        #")
 		print("#                                                                         #")
 		print("# Extract and validate data from Chad results.                            #")
