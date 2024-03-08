@@ -9,7 +9,9 @@ Made for educational purposes. I hope it will help!
 ## Table of Contents
 
 * [How to Install](#how-to-install)
-* [How to Build and Install Manually](#how-to-build-and-install-manually)
+	* [Install Playwright and Chromium](#install-playwright-and-chromium)
+	* [Standard Install](#standard-install)
+	* [Build and Install From the Source](#build-and-install-from-the-source)
 * [Shortest Possible](#shortest-possible)
 * [Basic Example: File Download](#basic-example-file-download)
 * [Chad Extractor](#chad-extractor)
@@ -23,15 +25,23 @@ Made for educational purposes. I hope it will help!
 
 ## How to Install
 
+### Install Playwright and Chromium
+
 ```bash
-pip3 install --upgrade google-chad
+pip3 install --upgrade playwright
 
 playwright install chromium
 ```
 
-## How to Build and Install Manually
+Make sure each time you upgrade your Playwright dependency to re-install Chromium; otherwise, you might get no results from Chad Extractor.
 
-Run the following commands:
+### Standard Install
+
+```bash
+pip3 install --upgrade google-chad
+```
+
+### Build and Install From the Source
 
 ```bash
 git clone https://github.com/ivan-sincek/chad && cd chad
@@ -41,8 +51,6 @@ python3 -m pip install --upgrade build
 python3 -m build
 
 python3 -m pip install dist/google_chad-5.6-py3-none-any.whl
-
-playwright install chromium
 ```
 
 ## Shortest Possible
