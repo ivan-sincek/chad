@@ -15,7 +15,7 @@ Made for educational purposes. I hope it will help!
 * [Shortest Possible](#shortest-possible)
 * [Basic Example: File Download](#basic-example-file-download)
 * [Chad Extractor](#chad-extractor)
-    * [Extracting and Validating Data)](#extracting-and-validating-data)
+    * [Extracting and Validating Data](#extracting-and-validating-data)
 * [Advanced Example: Social Media Takover](#advanced-example-social-media-takover)
     * [Basic Use (Single Domain)](#basic-use-single-domain)
     * [Advanced Use (Multiple Domains)](#advanced-use-multiple-domains)
@@ -81,7 +81,7 @@ There is a built-in 4 seconds delay between starting each headless browser; othe
 
 ### Extracting and Validating Data
 
-Chad Extractor was mainly designed to extract and validate data from Chad results; but, you can also use it to extract and validate data from plaintext files by specifying `-pt` option - plaintext files will be treated like server responses and extraction logic will be immediately applied.
+Chad Extractor was mainly designed to extract and validate data from Chad results; but, you can also use it to extract and validate data from plaintext files by specifying `-pt` option - plaintext files will be treated similar to server responses and extraction logic will be immediately applied.
 
 ## Advanced Example: Social Media Takover
 
@@ -95,7 +95,7 @@ intext:"twitter.com/"
 intext:"facebook.com/"
 intext:"instagram.com/"
 intext:"tiktok.com/"
-intext:"linkedin.com/in/" OR intext:"linkedin.com/company/"
+intext:"linkedin.com/company/" OR intext:"linkedin.com/in/"
 ```
 
 Prepare a template as [social_media_template.json](https://github.com/ivan-sincek/chad/blob/main/src/templates/social_media_template.json) file:
@@ -157,7 +157,7 @@ Make sure to properly escape regular expression specific symbols in your templat
 
 All regular expression searches are case-insensitive.
 
-Web content fetched from the URLs in Chad results will be matched against all the regular expressions (`extract` attributes) in the template file in order to find as much relevant data as possible.
+Web content fetched from the URLs from Chad results will be matched against all the regular expressions (`extract` attributes) from the template file in order to find as much relevant data as possible.
 
 To extract data without validating it, omit `validate` attributes from the template file as necessary.
 
@@ -234,7 +234,7 @@ chad-extractor -t social_media_template.json -res chad_results -a user_agents.tx
 
 Google's cooling-off period can be from a few hours to a whole day.
 
-To avoid hitting Google's rate limit with Chad, increase the minimum and maximum sleep between Google queries and/or pages; or use proxies \([1](https://geonode.com/free-proxy-list)\)\([2](https://proxyscrape.com/home)\), although, free proxies are not always stable and often blocked.
+To avoid hitting Google's rate limit with Chad, increase the minimum and maximum sleep between Google queries and/or pages; or use \[free\] proxies \([1](https://geonode.com/free-proxy-list)\)\([2](https://proxyscrape.com/home)\); although, free proxies are often blocked and unstable.
 
 To download a list of free proxies, run:
 
