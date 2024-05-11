@@ -50,7 +50,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-5.6-py3-none-any.whl
+python3 -m pip install dist/google_chad-5.7-py3-none-any.whl
 ```
 
 ## Shortest Possible
@@ -247,7 +247,7 @@ Additionally, to avoid hitting e.g. [Instagram's](https://www.instagram.com) rat
 ## Usage
 
 ```fundamental
-Chad v5.6 ( github.com/ivan-sincek/chad )
+Chad v5.7 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]
@@ -314,7 +314,7 @@ DEBUG
 ```
 
 ```fundamental
-Chad Extractor v5.6 ( github.com/ivan-sincek/chad )
+Chad Extractor v5.7 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results      -o out                 [-th threads] [-r retries] [-w wait]
 Example: chad-extractor -t template.json -res chad_results -o results_report.json [-th 10     ] [-r 5      ] [-w 10  ]

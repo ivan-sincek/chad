@@ -343,7 +343,7 @@ class Progress:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad v5.6 ( github.com/ivan-sincek/chad )")
+		print("Chad v5.7 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]")
@@ -562,7 +562,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v5.6                                #")
+		print("#                                Chad v5.7                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")
