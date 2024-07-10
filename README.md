@@ -16,7 +16,7 @@ Made for educational purposes. I hope it will help!
 * [Basic Example: File Download](#basic-example-file-download)
 * [Chad Extractor](#chad-extractor)
     * [Extracting and Validating Data](#extracting-and-validating-data)
-* [Advanced Example: Social Media Takover](#advanced-example-social-media-takover)
+* [Advanced Example: Social Media Takeover](#advanced-example-social-media-takeover)
     * [Basic Use (Single Domain)](#basic-use-single-domain)
     * [Advanced Use (Multiple Domains)](#advanced-use-multiple-domains)
 * [Rate Limiting](#rate-limiting)
@@ -83,7 +83,7 @@ There is a built-in 4 seconds delay between starting each headless browser; othe
 
 Chad Extractor was mainly designed to extract and validate data from Chad results; but, you can also use it to extract and validate data from plaintext files by specifying `-pt` option - plaintext files will be treated similar to server responses and extraction logic will be immediately applied.
 
-## Advanced Example: Social Media Takover
+## Advanced Example: Social Media Takeover
 
 Prepare Google Dorks as [social_media_dorks.txt](https://github.com/ivan-sincek/chad/blob/main/src/dorks/social_media_dorks.txt) file:
 
