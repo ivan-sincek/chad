@@ -176,10 +176,10 @@ To extract data without validation, simply omit the `validate` attributes from t
 
 | Scope | Name | Type | Required | Description |
 | --- | --- | --- | --- | --- |
-| extraction | extract | text | yes | Regular expression. |
+| extraction | extract | text | yes | Regular expression query. |
 | extraction | extract_prepend | text | no | String to prepend to all extracted data. |
 | extraction | extract_append | text | no | String to append to extracted data. |
-| validation | validate | text | no | Regular expression. |
+| validation | validate | text | no | Regular expression query. |
 | validation | validate_browser | boolean | no | Whether to use the headless browser or not. |
 | validation | validate_browser_wait | float | no | Wait time in seconds before fetching the content from the headless browser's page. |
 | validation | validate_cookies | dict | no | HTTP request cookies in key-value format. |
