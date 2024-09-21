@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "google-chad"
+version = "6.1"
+authors = [{ name = "Ivan Sincek" }]
+description = "Not another Google Dorking tool."
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent"
+]
+dependencies = [
+	"alive-progress>=3.1.5",
+	"asyncio>=3.4.3",
+	"colorama>=0.4.6",
+	"datetime>=5.2",
+	"nagooglesearch>=7.0",
+	"playwright>=1.47.0",
+	"regex>=2023.8.8",
+	"requests>=2.31.0",
+	"scrapy>=2.11.0",
+	"scrapy-playwright>=0.0.32",
+	"termcolor>=2.4.0"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ivan-sincek/chad"
+
+[project.scripts]
+chad = "chad.chad:main"
+chad-extractor = "chad_extractor.chad_extractor:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["dorks/*.txt", "templates/*.json"]
