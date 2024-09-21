@@ -196,7 +196,7 @@ chad-extractor -t social_media_template.json -res results.json -o results_report
 
 ### Multiple Sites
 
-Prepare the domains / subdomains as `sites.txt` file, the same way you would use them with the `-site:` option in Google:
+Prepare the domains / subdomains as `sites.txt` file, the same way you would use them with the `site:` option in Google:
 
 ```fundamental
 *.example.com
