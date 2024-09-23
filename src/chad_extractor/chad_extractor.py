@@ -627,7 +627,10 @@ class ChadExtractorSpider(scrapy.Spider):
 			await page.close()
 			await page.context.close()
 		else:
-			(body, error) = decode(response.body) # raw, from Scrapy
+			if hasattr(response, "text"):
+				body = response.text
+			else:
+				(body, error) = decode(response.body) # raw, from Scrapy
 		self.__print_redirected(playwright, response.status, record["url"], response.url)
 		if error:
 			self.__print_error(playwright, response.status, record["url"], error)
@@ -746,7 +749,7 @@ class ChadExtractor:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad Extractor v6.1 ( github.com/ivan-sincek/chad )")
+		print("Chad Extractor v6.2 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad-extractor -t template      -res results      -o out         [-s sleep] [-rs random-sleep]")
 		print("Example: chad-extractor -t template.json -res chad_results -o report.json [-s 1.5  ] [-rs             ]")
@@ -1097,7 +1100,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                           Chad Extractor v6.1                           #")
+		print("#                           Chad Extractor v6.2                           #")
 		print("#                                   by Ivan Sincek                        #")
 		print("#                                                                         #")
 		print("# Extract and validate data from Chad results or plaintext files.         #")
