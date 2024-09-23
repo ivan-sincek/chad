@@ -278,7 +278,7 @@ class SharedStorage:
 	# 1st round: extraction - pop all entries with no "extract" RegEx
 	# 2nd round: validation - pop all entries with no "validate" RegEx
 	def parse_template(self):
-		for key in self.__template:
+		for key in list(self.__template.keys()):
 			if self.__active["regex"] not in self.__template[key]:
 				self.__template.pop(key)
 		return bool(self.__template)
@@ -893,6 +893,9 @@ class Validate:
 				break
 			elif len(pvalue) < 1:
 				self.__error("Template: All primary keys must have at least one sub-key")
+				break
+			elif KEYS["extract"]["regex"] not in pvalue:
+				self.__error(f"Template[{pkey}]: Must contain '{KEYS['extract']['regex']}' sub-key")
 				break
 			error = False
 			for skey, svalue in pvalue.items():
