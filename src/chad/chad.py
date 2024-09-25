@@ -161,7 +161,7 @@ class Chad:
 				self.__wait()
 			for query in self.__queries:
 				count += 1
-				entry = {"query": query, "proxy": "", "urls": []}
+				entry = {"query": query, "proxy": None, "urls": None}
 				parameters = {
 					"q"     : entry["query"],
 					"tbs"   : self.__tbs,
