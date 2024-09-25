@@ -196,9 +196,9 @@ class Chad:
 					error = client.get_current_error()
 					if error:
 						termcolor.cprint(error, "yellow")
-						if error == client.get_init_error():
+						if error == "INIT_ERROR":
 							exit_program = True
-						elif error == client.get_requests_error() or error == client.get_rate_limit_error():
+						elif error == "REQUESTS_ERROR" or error == "429_TOO_MANY_REQUESTS":
 							if entry["proxy"]:
 								remove_proxy = True
 							else:
@@ -337,7 +337,7 @@ class Proxies:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad v6.3 ( github.com/ivan-sincek/chad )")
+		print("Chad v6.4 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]")
@@ -568,7 +568,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v6.3                                #")
+		print("#                                Chad v6.4                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")
