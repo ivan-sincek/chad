@@ -161,7 +161,7 @@ class Chad:
 				self.__wait()
 			for query in self.__queries:
 				count += 1
-				entry = {"query": query, "proxy": None, "urls": None}
+				entry = {"query": query, "proxy": "", "urls": []}
 				parameters = {
 					"q"     : entry["query"],
 					"tbs"   : self.__tbs,
@@ -193,10 +193,12 @@ class Chad:
 					entry["urls"] = client.search()
 					# --------------------
 					remove_proxy = False
-					for error in [client.get_rate_limit(), client.get_exception()]:
-						if error in entry["urls"]:
-							entry["urls"].pop(entry["urls"].index(error))
-							termcolor.cprint(error, "yellow")
+					error = client.get_current_error()
+					if error:
+						termcolor.cprint(error, "yellow")
+						if error == client.get_init_error():
+							exit_program = True
+						elif error == client.get_requests_error() or error == client.get_rate_limit_error():
 							if entry["proxy"]:
 								remove_proxy = True
 							else:
@@ -335,7 +337,7 @@ class Proxies:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad v6.2 ( github.com/ivan-sincek/chad )")
+		print("Chad v6.3 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]")
@@ -566,7 +568,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v6.2                                #")
+		print("#                                Chad v6.3                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")
