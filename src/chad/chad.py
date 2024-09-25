@@ -188,7 +188,7 @@ class Chad:
 						proxy       = entry["proxy"],
 						min_sleep   = self.__minimum_pages,
 						max_sleep   = self.__maximum_pages,
-						verbose     = self.__debug
+						debug       = self.__debug
 					)
 					entry["urls"] = client.search()
 					# --------------------
