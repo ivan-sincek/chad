@@ -749,7 +749,7 @@ class ChadExtractor:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad Extractor v6.4 ( github.com/ivan-sincek/chad )")
+		print("Chad Extractor v6.5 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad-extractor -t template      -res results      -o out         [-s sleep] [-rs random-sleep]")
 		print("Example: chad-extractor -t template.json -res chad_results -o report.json [-s 1.5  ] [-rs             ]")
@@ -1103,7 +1103,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                           Chad Extractor v6.4                           #")
+		print("#                           Chad Extractor v6.5                           #")
 		print("#                                   by Ivan Sincek                        #")
 		print("#                                                                         #")
 		print("# Extract and validate data from Chad results or plaintext files.         #")

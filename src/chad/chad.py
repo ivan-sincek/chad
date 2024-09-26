@@ -162,13 +162,13 @@ class Chad:
 			for query in self.__queries:
 				count += 1
 				entry = {"query": query, "proxy": None, "urls": None}
-				parameters = {
+				search_parameters = {
 					"q"     : entry["query"],
 					"tbs"   : self.__tbs,
-					"num"   : self.__get_num_pages(),
 					"hl"    : "en",
 					"filter": "0",
-					"safe"  : "images"
+					"safe"  : "images",
+					"num"   : self.__get_num_pages()
 				}
 				while not exit_program:
 					# --------------------
@@ -181,24 +181,24 @@ class Chad:
 					# --------------------
 					self.__status(count, entry["query"], entry["proxy"])
 					client = nagooglesearch.SearchClient(
-						tld         = "com",
-						parameters  = parameters,
-						max_results = self.__total_results,
-						user_agent  = self.__get_user_agent(),
-						proxy       = entry["proxy"],
-						min_sleep   = self.__minimum_pages,
-						max_sleep   = self.__maximum_pages,
-						debug       = self.__debug
+						tld               = "com",
+						search_parameters = search_parameters,
+						user_agent        = self.__get_user_agent(),
+						proxy             = entry["proxy"],
+						max_results       = self.__total_results,
+						min_sleep         = self.__minimum_pages,
+						max_sleep         = self.__maximum_pages,
+						debug             = self.__debug
 					)
 					entry["urls"] = client.search()
 					# --------------------
 					remove_proxy = False
-					error = client.get_current_error()
+					error = client.get_error()
 					if error:
 						termcolor.cprint(error, "yellow")
 						if error == "INIT_ERROR":
 							exit_program = True
-						elif error == "REQUESTS_ERROR" or error == "429_TOO_MANY_REQUESTS":
+						elif error == "REQUESTS_EXCEPTION" or error == "429_TOO_MANY_REQUESTS":
 							if entry["proxy"]:
 								remove_proxy = True
 							else:
@@ -337,7 +337,7 @@ class Proxies:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad v6.4 ( github.com/ivan-sincek/chad )")
+		print("Chad v6.5 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]")
@@ -568,7 +568,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v6.4                                #")
+		print("#                                Chad v6.5                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")
