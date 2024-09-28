@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "google-chad"
-version = "6.5"
+version = "6.6"
 authors = [{ name = "Ivan Sincek" }]
 description = "Not another Google Dorking tool."
 readme = "README.md"
@@ -18,7 +18,6 @@ dependencies = [
 	"alive-progress>=3.1.5",
 	"asyncio>=3.4.3",
 	"colorama>=0.4.6",
-	"datetime>=5.2",
 	"nagooglesearch>=7.3",
 	"playwright>=1.47.0",
 	"regex>=2023.8.8",
