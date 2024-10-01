@@ -507,14 +507,12 @@ class ChadExtractorSpider(scrapy.Spider):
 		print("Press CTRL + C to exit early - results will be saved but please be patient")
 		random.shuffle(data) # randomize URLs
 		for record in data:
-			headers = {}
-			cookies = {}
-			if self.__validation:
-				headers = self.__shared_storage.get_headers(record["key"])
-				cookies = self.__shared_storage.get_cookies(record["key"])
+			headers = self.__get_headers(self.__shared_storage.get_headers(record["key"]) if self.__validation else {})
+			cookies = self.__shared_storage.get_cookies(record["key"]) if self.__validation else {}
 			yield scrapy.Request(
 				url         = record["url"],
-				headers     = self.__get_headers(headers = headers, cookies = cookies),
+				headers     = headers,
+				cookies     = cookies,
 				meta        = self.__get_meta(record),
 				errback     = self.__exception,
 				callback    = self.__parse,
@@ -534,7 +532,7 @@ class ChadExtractorSpider(scrapy.Spider):
 			for key, value in headers.items(): # override
 				tmp[key.lower().strip()] = value
 		if cookies:
-			tmp["cookie"] = ("; ").join([f"{key}={value}" for key, value in cookies.items()]) # override
+			tmp["cookie"] = ("; ").join([f"{key}={value}" for key, value in cookies.items()]) # only for APIRequestContext.get()
 		return tmp
 
 	def __get_user_agent(self):
@@ -588,10 +586,10 @@ class ChadExtractorSpider(scrapy.Spider):
 		error    = ""
 		response = ""
 		try:
-			cookies  = self.__shared_storage.get_cookies(record["key"])
+			headers  = self.__get_headers(self.__shared_storage.get_headers(record["key"]), self.__shared_storage.get_cookies(record["key"]))
 			response = await page.request.get(
 				url                 = record["url"],
-				headers             = self.__get_headers(cookies = cookies),
+				headers             = headers,
 				ignore_https_errors = IGNORE_HTTPS_ERRORS,
 				timeout             = self.__request_timeout * 1000,
 				max_retries         = 0,

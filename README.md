@@ -115,7 +115,7 @@ Prepare the template as [social_media_template.json](https://github.com/ivan-sin
       "extract_prepend":"https://www.",
       "validate":"<iframe.+?src=\"\\/error\\?src=404.+?\">",
       "validate_cookies":{
-         "SOCS":"CAISNQgDEitib3FfaWRlbnRpdHlmcm9udGVuZHVpc2VydmVyXzIwMjQwOTEwLjA4X3AxGgJkZSACGgYIgLCotwY"
+         "SOCS":"CAESEwgDEgk2ODAzNDY5MTkaAmVuIAEaBgiA9-y3Bg"
       }
    },
    "twitter":{
@@ -183,8 +183,8 @@ To extract data without validation, simply omit the `validate` attributes from t
 | validation | validate | text | no | Regular expression query. |
 | validation | validate_browser | boolean | no | Whether to use the headless browser or not. |
 | validation | validate_browser_wait | float | no | Wait time in seconds before fetching the content from the headless browser's page. |
-| validation | validate_headers | dict | no | HTTP request headers in key-value format. |
-| validation | validate_cookies | dict | no | HTTP request cookies in key-value format. Will override the `Cookie` header. |
+| validation | validate_headers | dict | no | HTTP request headers in key-value format. The `Cookie` header is ignored. |
+| validation | validate_cookies | dict | no | HTTP request cookies in key-value format. |
 
 <p align="center">Table 1 - Template Attributes</p>
 
@@ -193,7 +193,7 @@ To extract data without validation, simply omit the `validate` attributes from t
 ```bash
 chad -q social_media_dorks.txt -s *.example.com -tr 200 -pr 100 -o results.json
 
-chad-extractor -t social_media_template.json -res results.json -o results_report.json
+chad-extractor -t social_media_template.json -res results.json -o report.json
 ```
 
 ### Multiple Sites

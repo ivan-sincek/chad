@@ -16,7 +16,7 @@
       "extract_prepend":"https://www.",
       "validate":"<iframe.+?src=\"\\/error\\?src=404.+?\">",
       "validate_cookies":{
-         "SOCS":"CAISNQgDEitib3FfaWRlbnRpdHlmcm9udGVuZHVpc2VydmVyXzIwMjQwOTEwLjA4X3AxGgJkZSACGgYIgLCotwY"
+         "SOCS":"CAESEwgDEgk2ODAzNDY5MTkaAmVuIAEaBgiA9-y3Bg"
       }
    },
    "twitter":{
