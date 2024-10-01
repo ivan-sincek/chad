@@ -337,7 +337,7 @@ class Proxies:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad v6.6 ( github.com/ivan-sincek/chad )")
+		print("Chad v6.7 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]")
 		print("Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]")
@@ -568,7 +568,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                                Chad v6.6                                #")
+		print("#                                Chad v6.7                                #")
 		print("#                                  by Ivan Sincek                         #")
 		print("#                                                                         #")
 		print("# Search Google Dorks like Chad.                                          #")

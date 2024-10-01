@@ -1,6 +1,6 @@
 {
    "telegram":{
-      "extract":"t\\.me\\/(?:(?!(?:share)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"t\\.me\\/(?:(?!(?:share)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://",
       "validate":"<meta property=\"og:title\" content=\"Telegram: Contact .+?\">"
    },
@@ -20,8 +20,9 @@
       }
    },
    "twitter":{
-      "extract":"(?<=(?<!pic\\.)twitter|x)\\.com\\/(?:(?!(?:explore|hashtag|home|i|intent|library|media|personalization|search|share|tos|widgets\\.js|[\\w]+\\/(?:privacy|tos))(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"(?<=(?<!pic\\.)twitter|(?<!pic\\.)x)\\.com\\/(?:(?!(?:[\\w]{2}\\/)*(?:explore|hashtag|home|i|intent|library|media|personalization|privacy|search|share|tos|widgets\\.js)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://x",
+      "extract_append":"?mx=2",
       "validate":"This account doesn.?t exist",
       "validate_browser":true,
       "validate_cookies":{
@@ -29,13 +30,13 @@
       }
    },
    "facebook":{
-      "extract":"facebook\\.com\\/(?:(?!(?:about|dialog|gaming|groups|public|sharer|share\\.php|terms\\.php)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"facebook\\.com\\/(?:(?!(?:about|dialog|gaming|groups|public|sharer|share\\.php|terms\\.php)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://www.",
       "validate":"This (?:content|page) isn't available",
       "validate_browser":true
    },
    "instagram":{
-      "extract":"instagram\\.com\\/(?:(?!(?:about|accounts|ar|explore|p)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"instagram\\.com\\/(?:(?!(?:about|accounts|ar|explore|p)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://www.",
       "extract_append":"/",
       "validate":"Sorry, this page isn't available\\.",

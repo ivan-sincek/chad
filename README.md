@@ -15,11 +15,11 @@ Made for educational purposes. I hope it will help!
 * [Shortest Possible](#shortest-possible)
 * [File Download](#file-download)
 * [Chad Extractor](#chad-extractor)
-* [Social Media Takeover](#social-media-takeover)
+* [Broken Link Hijacking](#broken-link-hijacking)
     * [Single Site](#single-site)
     * [Multiple Sites](#multiple-sites)
     * [Analyzing the Report](#analyzing-the-report)
-* [Rate Limiting](#rate-limiting)
+    * [Rate Limiting](#rate-limiting)
 * [Usage](#usage)
 * [Images](#images)
 
@@ -50,7 +50,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-6.6-py3-none-any.whl
+python3 -m pip install dist/google_chad-6.7-py3-none-any.whl
 ```
 
 ## Shortest Possible
@@ -69,17 +69,17 @@ mkdir downloads
 chad -q "ext:pdf OR ext:docx OR ext:xlsx OR ext:pptx" -s *.example.com -tr 200 -dir downloads
 ```
 
-_Chad's file download feature is based on Python Requests library._
+Chad's file download feature is based on Python Requests dependency.
 
 ## Chad Extractor
 
-Chad Extractor is a powerful tool based on [Scrapy's](https://scrapy.org) web crawler and [Playwright's](https://playwright.dev/python) Chromium headless browser, designed to efficiently scrape web content; unlike Python Requests library, which cannot render JavaScript encoded HTML and is easily blocked by anti-bot solutions.
+Chad Extractor is a powerful tool based on [Scrapy's](https://scrapy.org) web crawler and [Playwright's](https://playwright.dev/python) Chromium headless browser, designed to efficiently scrape web content; unlike Python Requests dependency, which cannot render JavaScript encoded HTML and is easily blocked by anti-bot solutions.
 
 Primarily, Chad Extractor is designed to extract and validate data from Chad results files. However, it can also be used to extract and validate data from plaintext files by using the `-pt` option.
 
-If the `-pt` option is used, plaintext files will be immediately treated like server responses, and the extraction logic will be applied, followed by validation. This is also useful if you want to re-test previous Chad Extractor's reports, e.g., by using `-res chad_extractor_report.json -pt`.
+If the `-pt` option is used, plaintext files will be treated like server responses, and the extraction logic will be applied, followed by validation. This is also useful if you want to re-test previous Chad Extractor's reports, e.g., by using `-res report.json -pt -o retest.json`.
 
-## Social Media Takeover
+## Broken Link Hijacking
 
 Prepare the Google Dorks as [social_media_dorks.txt](https://github.com/ivan-sincek/chad/blob/main/src/dorks/social_media_dorks.txt) file:
 
@@ -99,7 +99,7 @@ Prepare the template as [social_media_template.json](https://github.com/ivan-sin
 ```json
 {
    "telegram":{
-      "extract":"t\\.me\\/(?:(?!(?:share)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"t\\.me\\/(?:(?!(?:share)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://",
       "validate":"<meta property=\"og:title\" content=\"Telegram: Contact .+?\">"
    },
@@ -119,8 +119,9 @@ Prepare the template as [social_media_template.json](https://github.com/ivan-sin
       }
    },
    "twitter":{
-      "extract":"(?<=(?<!pic\\.)twitter|x)\\.com\\/(?:(?!(?:explore|hashtag|home|i|intent|library|media|personalization|search|share|tos|widgets\\.js|[\\w]+\\/(?:privacy|tos))(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"(?<=(?<!pic\\.)twitter|(?<!pic\\.)x)\\.com\\/(?:(?!(?:[\\w]{2}\\/)*(?:explore|hashtag|home|i|intent|library|media|personalization|privacy|search|share|tos|widgets\\.js)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://x",
+      "extract_append":"?mx=2",
       "validate":"This account doesn.?t exist",
       "validate_browser":true,
       "validate_cookies":{
@@ -128,13 +129,13 @@ Prepare the template as [social_media_template.json](https://github.com/ivan-sin
       }
    },
    "facebook":{
-      "extract":"facebook\\.com\\/(?:(?!(?:about|dialog|gaming|groups|public|sharer|share\\.php|terms\\.php)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"facebook\\.com\\/(?:(?!(?:about|dialog|gaming|groups|public|sharer|share\\.php|terms\\.php)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://www.",
       "validate":"This (?:content|page) isn't available",
       "validate_browser":true
    },
    "instagram":{
-      "extract":"instagram\\.com\\/(?:(?!(?:about|accounts|ar|explore|p)(?:$|(?:\\/|\\?)[^\\s]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract":"instagram\\.com\\/(?:(?!(?:about|accounts|ar|explore|p)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://www.",
       "extract_append":"/",
       "validate":"Sorry, this page isn't available\\.",
@@ -182,7 +183,8 @@ To extract data without validation, simply omit the `validate` attributes from t
 | validation | validate | text | no | Regular expression query. |
 | validation | validate_browser | boolean | no | Whether to use the headless browser or not. |
 | validation | validate_browser_wait | float | no | Wait time in seconds before fetching the content from the headless browser's page. |
-| validation | validate_cookies | dict | no | HTTP request cookies in key-value format. |
+| validation | validate_headers | dict | no | HTTP request headers in key-value format. |
+| validation | validate_cookies | dict | no | HTTP request cookies in key-value format. Will override the `Cookie` header. |
 
 <p align="center">Table 1 - Template Attributes</p>
 
@@ -203,27 +205,19 @@ Prepare the domains / subdomains as `sites.txt` file, the same way you would use
 *.example.com -www
 ```
 
-\[Optional\] Prepare bot-safe user agents as `user_agents.txt` file, where `<your-api-key>` is your API key from [scrapeops.io](https://scrapeops.io):
-
-```python
-python3 -c 'import json, requests; open("user_agents.txt", "w").write(("\n").join(requests.get("http://headers.scrapeops.io/v1/user-agents?api_key=<your-api-key>&num_results=100", verify = False).json()["result"]))'
-```
-
-_Twitter/X might not work well with some of the user agents._
-
 Run:
 
 ```bash
 mkdir chad_results
 
-IFS=$'\n'; count=0; for site in $(cat sites.txt); do count=$((count+1)); echo "#${count} | ${site}"; chad -q social_media_dorks.txt -s "${site}" -tr 200 -pr 100 -a user_agents.txt -o "chad_results/results_${count}.json"; done
+IFS=$'\n'; count=0; for site in $(cat sites.txt); do count=$((count+1)); echo "#${count} | ${site}"; chad -q social_media_dorks.txt -s "${site}" -tr 200 -pr 100 -o "chad_results/results_${count}.json"; done
 
-chad-extractor -t social_media_template.json -res chad_results -a user_agents.txt -o results_report.json -v
+chad-extractor -t social_media_template.json -res chad_results -o report.json -v
 ```
 
-## Analyzing the Report
+### Analyzing the Report
 
-Manually verify if the social media URLs in `results[summary][validated]` are vulnerable to takeover:
+Manually verify if the broken social media URLs in `results[summary][validated]` are vulnerable to takeover:
 
 ```json
 {
@@ -260,7 +254,7 @@ Manually verify if the social media URLs in `results[summary][validated]` are vu
 }
 ```
 
-## Rate Limiting
+### Rate Limiting
 
 Google's cooling-off period can range from a few hours to a whole day.
 
@@ -279,7 +273,7 @@ Additionally, to avoid hitting rate limits on platforms like [Instagram's](https
 ## Usage
 
 ```fundamental
-Chad v6.6 ( github.com/ivan-sincek/chad )
+Chad v6.7 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]
@@ -346,7 +340,7 @@ DEBUG
 ```
 
 ```fundamental
-Chad Extractor v6.6 ( github.com/ivan-sincek/chad )
+Chad Extractor v6.7 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results      -o out         [-s sleep] [-rs random-sleep]
 Example: chad-extractor -t template.json -res chad_results -o report.json [-s 1.5  ] [-rs             ]
@@ -423,13 +417,13 @@ DEBUG
 
 ## Images
 
-<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/single_dork.png" alt="(Chad) Single File Download Google Dork"></p>
+<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/single_google_dork.png" alt="(Chad) File Download - Single Google Dork"></p>
 
-<p align="center">Figure 1 - (Chad) Single File Download Google Dork</p>
+<p align="center">Figure 1 - (Chad) File Download - Single Google Dork</p>
 
-<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/multiple_dorks.png" alt="(Chad) Multiple Social Media Google Dorks"></p>
+<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/multiple_google_dorks.png" alt="(Chad) Broken Link Hijacking - Multiple Google Dorks"></p>
 
-<p align="center">Figure 2 - (Chad) Multiple Social Media Google Dorks</p>
+<p align="center">Figure 2 - (Chad) Broken Link Hijacking - Multiple Google Dorks</p>
 
 <p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/extraction.png" alt="Extraction"></p>
 

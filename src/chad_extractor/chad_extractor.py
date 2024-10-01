@@ -39,6 +39,7 @@ KEYS = {
 	},
 	"validate": {
 		"regex"          : "validate",
+		"headers"        : "validate_headers",
 		"cookies"        : "validate_cookies",
 		"playwright"     : "validate_browser",
 		"playwright_wait": "validate_browser_wait",
@@ -360,6 +361,14 @@ class SharedStorage:
 		# --------------------------------
 		return unique(matches, sort = True)
 
+	def get_headers(self, key): # applies only for validation
+		headers = {}
+		# --------------------------------
+		if KEYS["validate"]["headers"] in self.__template[key]:
+			headers = self.__template[key][KEYS["validate"]["headers"]]
+		# --------------------------------
+		return headers
+
 	def get_cookies(self, key): # applies only for validation
 		cookies = {}
 		# --------------------------------
@@ -498,30 +507,34 @@ class ChadExtractorSpider(scrapy.Spider):
 		print("Press CTRL + C to exit early - results will be saved but please be patient")
 		random.shuffle(data) # randomize URLs
 		for record in data:
+			headers = {}
 			cookies = {}
 			if self.__validation:
+				headers = self.__shared_storage.get_headers(record["key"])
 				cookies = self.__shared_storage.get_cookies(record["key"])
 			yield scrapy.Request(
 				url         = record["url"],
-				headers     = self.__get_headers(),
-				cookies     = cookies,
+				headers     = self.__get_headers(headers = headers, cookies = cookies),
 				meta        = self.__get_meta(record),
 				errback     = self.__exception,
 				callback    = self.__parse,
 				dont_filter = False # if "True", allow duplicate requests
 			)
 
-	def __get_headers(self, cookies = None):
+	def __get_headers(self, headers = {}, cookies = {}):
 		tmp = {
-			"User-Agent"               : self.__get_user_agent(),
-			"Accept-Language"          : "en-US, *", # some websites require "en-US"
-			"Accept"                   : "*/*",
-			"Connection"               : "keep-alive",
-			"Referer"                  : "https://www.google.com/",
-			"Upgrade-Insecure-Requests": "1"
+			"user-agent"               : self.__get_user_agent(),
+			"accept-language"          : "en-US, *",
+			"accept"                   : "*/*",
+			"connection"               : "keep-alive",
+			"referer"                  : "https://www.google.com/",
+			"upgrade-insecure-requests": "1"
 		}
+		if headers:
+			for key, value in headers.items(): # override
+				tmp[key.lower().strip()] = value
 		if cookies:
-			tmp["Cookie"] = ("; ").join([f"{key}={value}" for key, value in cookies.items()])
+			tmp["cookie"] = ("; ").join([f"{key}={value}" for key, value in cookies.items()]) # override
 		return tmp
 
 	def __get_user_agent(self):
@@ -578,7 +591,7 @@ class ChadExtractorSpider(scrapy.Spider):
 			cookies  = self.__shared_storage.get_cookies(record["key"])
 			response = await page.request.get(
 				url                 = record["url"],
-				headers             = self.__get_headers(cookies),
+				headers             = self.__get_headers(cookies = cookies),
 				ignore_https_errors = IGNORE_HTTPS_ERRORS,
 				timeout             = self.__request_timeout * 1000,
 				max_retries         = 0,
@@ -749,7 +762,7 @@ class ChadExtractor:
 class MyArgParser(argparse.ArgumentParser):
 
 	def print_help(self):
-		print("Chad Extractor v6.6 ( github.com/ivan-sincek/chad )")
+		print("Chad Extractor v6.7 ( github.com/ivan-sincek/chad )")
 		print("")
 		print("Usage:   chad-extractor -t template      -res results      -o out         [-s sleep] [-rs random-sleep]")
 		print("Example: chad-extractor -t template.json -res chad_results -o report.json [-s 1.5  ] [-rs             ]")
@@ -884,61 +897,74 @@ class Validate:
 
 	def __validate_template_keys(self, value):
 		regex = r"[\w\d\-\_]+"
-		for pkey, pvalue in value.items():
-			if not isinstance(pkey, str) or not pkey:
-				self.__error("Template: All primary keys must be non-empty strings")
-				break
-			elif not re.search(regex, pkey):
-				self.__error(f"Template: All primary keys must match {regex} format")
-				break
-			elif len(pvalue) < 1:
-				self.__error("Template: All primary keys must have at least one sub-key")
-				break
-			elif KEYS["extract"]["regex"] not in pvalue:
-				self.__error(f"Template[{pkey}]: Must contain '{KEYS['extract']['regex']}' sub-key")
-				break
-			error = False
-			for skey, svalue in pvalue.items():
-				if skey in [KEYS["extract"]["regex"], KEYS["validate"]["regex"]]:
-					if not isinstance(svalue, str) or not svalue:
-						self.__error(f"Template[{pkey}][{skey}]: Must be a non-empty string")
-						error = True
-						break
-					else:
-						try:
-							re.compile(svalue)
-						except re.error as ex:
-							self.__error(f"Template[{pkey}][{skey}]: Invalid RegEx: {svalue}")
+		if not isinstance(value, dict):
+			self.__error("Template must be a dictionary")
+		else:
+			for pkey, pvalue in value.items():
+				if not isinstance(pkey, str) or not pkey:
+					self.__error("Template: All primary keys must be non-empty strings")
+					break
+				elif not re.search(regex, pkey):
+					self.__error(f"Template: All primary keys must match {regex} format")
+					break
+				elif not isinstance(pvalue, dict):
+					self.__error(f"Template[{pkey}]: Must be a dictionary")
+					break
+				elif KEYS["extract"]["regex"] not in pvalue:
+					self.__error(f"Template[{pkey}]: Must contain '{KEYS['extract']['regex']}' sub-key")
+					break
+				error = False
+				for skey, svalue in pvalue.items():
+					if skey in [KEYS["extract"]["regex"], KEYS["validate"]["regex"]]:
+						if not isinstance(svalue, str) or not svalue:
+							self.__error(f"Template[{pkey}][{skey}]: Must be a non-empty string")
 							error = True
 							break
-				elif skey in [KEYS["extract"]["prepend"], KEYS["extract"]["append"]]:
-					if not isinstance(svalue, str):
-						self.__error(f"Template[{pkey}][{skey}]: Must be a string")
-						error = True
-						break
-				elif skey in [KEYS["validate"]["cookies"]]:
-					if not isinstance(svalue, dict):
-						self.__error(f"Template[{pkey}][{skey}]: Must be a dictionary")
-						error = True
-						break
+						else:
+							try:
+								re.compile(svalue)
+							except re.error as ex:
+								self.__error(f"Template[{pkey}][{skey}]: Invalid RegEx: {svalue}")
+								error = True
+								break
+					elif skey in [KEYS["extract"]["prepend"], KEYS["extract"]["append"]]:
+						if not isinstance(svalue, str):
+							self.__error(f"Template[{pkey}][{skey}]: Must be a string")
+							error = True
+							break
+					elif skey in [KEYS["validate"]["headers"], KEYS["validate"]["cookies"]]:
+						if not isinstance(svalue, dict):
+							self.__error(f"Template[{pkey}][{skey}]: Must be a dictionary")
+							error = True
+							break
+						else:
+							for dkey, dvalue in svalue.items():
+								if not isinstance(dkey, str) or not dkey:
+									self.__error(f"Template[{pkey}][{skey}]: All primary keys must be non-empty strings")
+									error = True
+									break
+								elif not isinstance(dvalue, str):
+									self.__error(f"Template[{pkey}][{skey}][{dkey}]: Must be a string")
+									error = True
+									break
+							if error:
+								break
+					elif skey in [KEYS["validate"]["playwright"]]:
+						if not isinstance(svalue, bool):
+							self.__error(f"Template[{pkey}][{skey}]: Must be a boolean")
+							error = True
+							break
+					elif skey in [KEYS["validate"]["playwright_wait"]]:
+						if not isinstance(svalue, (int, float)) or svalue < 0:
+							self.__error(f"Template[{pkey}][{skey}]: Must be numeric and greater than or equal to zero")
+							error = True
+							break
 					else:
-						pass
-				elif skey in [KEYS["validate"]["playwright"]]:
-					if not isinstance(svalue, bool):
-						self.__error(f"Template[{pkey}][{skey}]: Must be a boolean")
+						self.__error(f"Template[{pkey}]: Contains a non-supported sub-key: {skey}")
 						error = True
 						break
-				elif skey in [KEYS["validate"]["playwright_wait"]]:
-					if not (isinstance(svalue, float) or isinstance(svalue, int)) or float(svalue) < 0:
-						self.__error(f"Template[{pkey}][{skey}]: Must be a float and greater than or equal to zero")
-						error = True
-						break
-				else:
-					self.__error(f"Template[{pkey}]: Contains non-supported sub-key: {skey}")
-					error = True
+				if error:
 					break
-			if error:
-				break
 		return value
 
 	def __parse_template(self, value):
@@ -1103,7 +1129,7 @@ def main():
 	if validate.run():
 		print("###########################################################################")
 		print("#                                                                         #")
-		print("#                           Chad Extractor v6.6                           #")
+		print("#                           Chad Extractor v6.7                           #")
 		print("#                                   by Ivan Sincek                        #")
 		print("#                                                                         #")
 		print("# Extract and validate data from Chad results or plaintext files.         #")
