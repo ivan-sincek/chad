@@ -121,7 +121,6 @@ Prepare the template as [social_media_template.json](https://github.com/ivan-sin
    "twitter":{
       "extract":"(?<=(?<!pic\\.)twitter|(?<!pic\\.)x)\\.com\\/(?:(?!(?:[\\w]{2}\\/)*(?:explore|hashtag|home|i|intent|library|media|personalization|privacy|search|share|tos|widgets\\.js)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
       "extract_prepend":"https://x",
-      "extract_append":"?mx=2",
       "validate":"This account doesn.?t exist",
       "validate_browser":true,
       "validate_cookies":{

@@ -63,6 +63,12 @@ def parse_float(value):
 		pass
 	return tmp
 
+def decode(data): # returns (decoded, error)
+	try:
+		return (data.decode(DEFAULT_ENCODING), "")
+	except UnicodeDecodeError as ex:
+		return ("", ex)
+
 def unique(sequence, sort = False):
 	seen = set()
 	array = [x for x in sequence if not (x in seen or seen.add(x))]
@@ -121,12 +127,6 @@ def jload_file(file):
 
 def jdump(data):
 	return json.dumps(data, indent = 4, ensure_ascii = False) if data else ""
-
-def decode(data): # (decoded, error)
-	try:
-		return (data.decode(DEFAULT_ENCODING), "")
-	except UnicodeDecodeError as ex:
-		return ("", ex)
 
 def get_timestamp(text):
 	print(f"{datetime.datetime.now().strftime('%H:%M:%S')} - {text}")
@@ -230,18 +230,19 @@ class CustomManager(multiprocessing.managers.BaseManager):
 
 class SharedStorage:
 
-	def __init__(self, template, data, plaintext, excludes, debug):
-		self.__template  = template
-		self.__data      = data
-		self.__plaintext = plaintext
-		self.__excludes  = excludes
-		self.__debug     = debug
+	def __init__(self, template, data, plaintext, excludes, user_agents, debug):
+		self.__template        = template
+		self.__data            = data
+		self.__plaintext       = plaintext
+		self.__excludes        = excludes
+		self.__user_agents     = user_agents
+		self.__user_agents_len = len(self.__user_agents)
+		self.__debug           = debug
+		self.__flags           = re.MULTILINE | re.IGNORECASE
 		# --------------------------------
 		self.__extraction = True
 		self.__active     = KEYS["extract"]
-		# --------------------------------
-		self.__flags   = re.MULTILINE | re.IGNORECASE
-		self.__results = {
+		self.__results    = {
 			KEYS["extract" ]["success"]: [],
 			KEYS["extract" ]["error"  ]: [],
 			KEYS["validate"]["success"]: [],
@@ -337,12 +338,9 @@ class SharedStorage:
 			elif key and re.search(self.__template[key][KEYS["validate"]["regex"]], response, flags = self.__flags):
 				tmp = True
 		except (re.error, KeyError) as ex:
-			self.__print_error(ex)
+			if self.__debug:
+				termcolor.cprint(msg, "red")
 		return tmp
-
-	def __print_error(self, msg):
-		if self.__debug:
-			termcolor.cprint(msg, "red")
 
 	# ------------------------------------
 
@@ -360,22 +358,6 @@ class SharedStorage:
 				matches[i] = ("{0}{1}{2}").format(prepend, matches[i], append)
 		# --------------------------------
 		return unique(matches, sort = True)
-
-	def get_headers(self, key): # applies only for validation
-		headers = {}
-		# --------------------------------
-		if KEYS["validate"]["headers"] in self.__template[key]:
-			headers = self.__template[key][KEYS["validate"]["headers"]]
-		# --------------------------------
-		return headers
-
-	def get_cookies(self, key): # applies only for validation
-		cookies = {}
-		# --------------------------------
-		if KEYS["validate"]["cookies"] in self.__template[key]:
-			cookies = self.__template[key][KEYS["validate"]["cookies"]]
-		# --------------------------------
-		return cookies
 
 	def require_playwright(self): # applies only for validation
 		(playwright, playwright_wait) = (False, 0)
@@ -397,6 +379,43 @@ class SharedStorage:
 			playwright_wait = self.__template[key][KEYS["validate"]["playwright_wait"]]
 		# --------------------------------
 		return (playwright, playwright_wait)
+
+	# ------------------------------------
+
+	def get_headers(self, key = None, with_cookies = False):
+		default = {
+			"User-Agent"               : self.__get_user_agent(),
+			"Accept-Language"          : "en-US, *",
+			"Accept"                   : "*/*",
+			"Connection"               : "keep-alive",
+			"Referer"                  : "https://www.google.com/",
+			"Upgrade-Insecure-Requests": "1"
+		}
+		headers = {}
+		for pkey, pvalue in default.items():
+			headers[pkey.lower()] = pvalue
+		# --------------------------------
+		if key and self.validation_started() and KEYS["validate"]["headers"] in self.__template[key]:
+			for pkey, pvalue in self.__template[key][KEYS["validate"]["headers"]].items(): # override default headers
+				headers[pkey.lower()] = pvalue
+		# --------------------------------
+		if with_cookies:
+			cookies = self.get_cookies(key)
+			if cookies:
+				headers["cookie"] = ("; ").join([f"{pkey}={pvalue}" for pkey, pvalue in cookies.items()]) # only for APIRequestContext.get()
+		# --------------------------------
+		return headers
+
+	def __get_user_agent(self):
+		return self.__user_agents[random.randint(0, self.__user_agents_len - 1)]
+
+	def get_cookies(self, key):
+		cookies = {}
+		# --------------------------------
+		if key and self.validation_started() and KEYS["validate"]["cookies"] in self.__template[key]:
+			cookies = self.__template[key][KEYS["validate"]["cookies"]]
+		# --------------------------------
+		return cookies
 
 # ----------------------------------------
 
@@ -487,68 +506,44 @@ class ChadExtractorSpider(scrapy.Spider):
 	name = "ChadExtractorSpider"
 	handle_httpstatus_list = [401, 403, 404]
 
-	def __init__(self, shared_storage, playwright, playwright_wait, request_timeout, user_agents, proxy, debug):
-		self.__shared_storage  = shared_storage
-		self.__validation      = self.__shared_storage.validation_started()
-		self.__playwright      = playwright
-		self.__playwright_wait = playwright_wait
-		self.__request_timeout = request_timeout
-		self.__user_agents     = user_agents
-		self.__user_agents_len = len(self.__user_agents)
-		self.__proxy           = proxy
-		self.__debug           = debug
-		self.__context         = 0
+	def __init__(self, shared_storage, playwright, playwright_wait, request_timeout, proxy, debug):
+		self.__shared_storage     = shared_storage
+		self.__validation_started = self.__shared_storage.validation_started()
+		self.__playwright         = playwright
+		self.__playwright_wait    = playwright_wait
+		self.__request_timeout    = request_timeout
+		self.__proxy              = proxy
+		self.__debug              = debug
+		self.__context            = 0
 
 	# main
 	def start_requests(self):
 		data = self.__shared_storage.get_data()
-		action = KEYS["validate"]["regex"] if self.__shared_storage.validation_started() else KEYS["extract"]["regex"]
+		action = KEYS["validate"]["regex"] if self.__validation_started else KEYS["extract"]["regex"]
 		get_timestamp(f"Number of URLs to {action}: {len(data)}")
 		print("Press CTRL + C to exit early - results will be saved but please be patient")
 		random.shuffle(data) # randomize URLs
 		for record in data:
-			headers = self.__get_headers(self.__shared_storage.get_headers(record["key"]) if self.__validation else {})
-			cookies = self.__shared_storage.get_cookies(record["key"]) if self.__validation else {}
 			yield scrapy.Request(
 				url         = record["url"],
-				headers     = headers,
-				cookies     = cookies,
+				headers     = self.__shared_storage.get_headers(record["key"]),
+				cookies     = self.__shared_storage.get_cookies(record["key"]),
 				meta        = self.__get_meta(record),
-				errback     = self.__exception,
+				errback     = self.__error,
 				callback    = self.__parse,
 				dont_filter = False # if "True", allow duplicate requests
 			)
 
-	def __get_headers(self, headers = {}, cookies = {}):
-		tmp = {
-			"user-agent"               : self.__get_user_agent(),
-			"accept-language"          : "en-US, *",
-			"accept"                   : "*/*",
-			"connection"               : "keep-alive",
-			"referer"                  : "https://www.google.com/",
-			"upgrade-insecure-requests": "1"
-		}
-		if headers:
-			for key, value in headers.items(): # override
-				tmp[key.lower().strip()] = value
-		if cookies:
-			tmp["cookie"] = ("; ").join([f"{key}={value}" for key, value in cookies.items()]) # only for APIRequestContext.get()
-		return tmp
-
-	def __get_user_agent(self):
-		return self.__user_agents[random.randint(0, self.__user_agents_len - 1)]
-
 	def __get_meta(self, record):
 		# --------------------------------
-		(playwright, playwright_wait) = (self.__playwright, self.__playwright_wait)
-		if self.__validation and self.__playwright:
-			(playwright, playwright_wait) = self.__shared_storage.get_playwright(record["key"])
+		if self.__validation_started:
+			(self.__playwright, self.__playwright_wait) = self.__shared_storage.get_playwright(record["key"])
 		# --------------------------------
 		self.__context += 1
 		return {
-			"record"                     : record,          # custom attribute
-			"playwright_wait"            : playwright_wait, # custom attribute
-			"playwright"                 : playwright,
+			"record"                     : record,                 # custom attribute
+			"playwright_wait"            : self.__playwright_wait, # custom attribute
+			"playwright"                 : self.__playwright,
 			"playwright_context"         : str(self.__context),
 			"playwright_context_kwargs"  : {
 				"ignore_https_errors"    : IGNORE_HTTPS_ERRORS,
@@ -556,7 +551,7 @@ class ChadExtractorSpider(scrapy.Spider):
 				"accept_downloads"       : False,
 				"bypass_csp"             : False
 			},
-			"playwright_include_page"    : playwright,
+			"playwright_include_page"    : self.__playwright,
 			"playwright_page_goto_kwargs": {"wait_until": "load"},
 			"proxy"                      : self.__proxy,
 			"cookiejar"                  : self.__context,
@@ -565,7 +560,7 @@ class ChadExtractorSpider(scrapy.Spider):
 
 	# ------------------------------------
 
-	async def __exception(self, failure):
+	async def __error(self, failure):
 		record     = failure.request.meta["record"    ]
 		playwright = failure.request.meta["playwright"]
 		status     = 0
@@ -584,19 +579,18 @@ class ChadExtractorSpider(scrapy.Spider):
 
 	async def __playwright_fallback(self, record, playwright, page):
 		error    = ""
-		response = ""
+		response = None
 		try:
-			headers  = self.__get_headers(self.__shared_storage.get_headers(record["key"]), self.__shared_storage.get_cookies(record["key"]))
 			response = await page.request.get(
 				url                 = record["url"],
-				headers             = headers,
+				headers             = self.__shared_storage.get_headers(record["key"], with_cookies = True),
 				ignore_https_errors = IGNORE_HTTPS_ERRORS,
 				timeout             = self.__request_timeout * 1000,
 				max_retries         = 0,
 				max_redirects       = MAX_REDIRECTS
 			)
 			body = await response.body() # raw
-			body = body.decode(DEFAULT_ENCODING)
+			body = body.decode(DEFAULT_ENCODING) # text
 			self.__parse_success(record, playwright, response.status, body)
 		except (PlaywrightError, PlaywrightTimeoutError, UnicodeDecodeError) as ex:
 			error = str(ex).splitlines()[0]
@@ -634,14 +628,14 @@ class ChadExtractorSpider(scrapy.Spider):
 			wait = response.request.meta["playwright_wait"]
 			if wait > 0:
 				await asyncio.sleep(wait)
-			body = await page.content() # text, from Playwright
+			body = await page.content() # text
 			await page.close()
 			await page.context.close()
 		else:
 			if hasattr(response, "text"):
-				body = response.text
+				body = response.text # text
 			else:
-				(body, error) = decode(response.body) # raw, from Scrapy
+				(body, error) = decode(response.body) # raw
 		self.__print_redirected(playwright, response.status, record["url"], response.url)
 		if error:
 			self.__print_error(playwright, response.status, record["url"], error)
@@ -653,27 +647,29 @@ class ChadExtractorSpider(scrapy.Spider):
 		entry["results"] = self.__shared_storage.parse_response(body, record["key"])
 		if entry["results"]:
 			self.__shared_storage.append_success(entry)
-			self.__print_results(playwright, status, record["url"])
+			self.__print_success_results(playwright, status, record["url"])
 		else:
-			self.__print_no_results(playwright, status, record["url"])
+			self.__print_success_no_results(playwright, status, record["url"])
 
-	def __print_results(self, playwright, status, url):
+	def __print_success_results(self, playwright, status, url):
 		if self.__debug:
-			termcolor.cprint(f"[ {'VALIDATED' if self.__validation else 'EXTRACTED'} ] PW:{int(playwright)} | {status} {url}", "green")
+			action = KEYS["validate"]["success"] if self.__validation_started else KEYS["extract"]["success"]
+			termcolor.cprint(f"[ {action.upper()} ] PW:{int(playwright)} | {status} {url}", "green")
 
-	def __print_no_results(self, playwright, status, url):
+	def __print_success_no_results(self, playwright, status, url):
 		if self.__debug:
 			termcolor.cprint(f"[ NO MATCH ] PW:{int(playwright)} | {status} {url}", "magenta")
 
 	def __print_redirected(self, playwright, status, request_url, response_url):
-		if self.__debug and urllib.parse.urlparse(request_url).geturl() != response_url:
-			termcolor.cprint(f"[ REDIRECTED ] PW:{int(playwright)} | {request_url} -> {status} {response_url}", "yellow")
+		if self.__debug:
+			if urllib.parse.urlsplit(request_url).geturl() != response_url:
+				termcolor.cprint(f"[ REDIRECTED ] PW:{int(playwright)} | {request_url} -> {status} {response_url}", "yellow")
 
 # ----------------------------------------
 
 class ChadExtractor:
 
-	def __init__(self, shared_storage, playwright, playwright_wait, concurrent_requests, concurrent_requests_domain, sleep, random_sleep, auto_throttle, retries, request_timeout, user_agents, proxy, debug):
+	def __init__(self, shared_storage, playwright, playwright_wait, concurrent_requests, concurrent_requests_domain, sleep, random_sleep, auto_throttle, retries, request_timeout, proxy, debug):
 		self.__shared_storage             = shared_storage
 		self.__playwright                 = playwright
 		self.__playwright_wait            = playwright_wait
@@ -684,7 +680,6 @@ class ChadExtractor:
 		self.__auto_throttle              = auto_throttle
 		self.__retries                    = retries
 		self.__request_timeout            = request_timeout # all timeouts
-		self.__user_agents                = user_agents
 		self.__proxy                      = proxy
 		self.__debug                      = debug
 		# --------------------------------
@@ -738,7 +733,7 @@ class ChadExtractor:
 			settings["PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT"] = self.__request_timeout * 1000
 		# --------------------------------
 		crawler = scrapy.crawler.CrawlerProcess(settings)
-		crawler.crawl(ChadExtractorSpider, self.__shared_storage, self.__playwright, self.__playwright_wait, self.__request_timeout, self.__user_agents, self.__proxy, self.__debug)
+		crawler.crawl(ChadExtractorSpider, self.__shared_storage, self.__playwright, self.__playwright_wait, self.__request_timeout, self.__proxy, self.__debug)
 		crawler.start()
 		crawler.join()
 
@@ -936,13 +931,13 @@ class Validate:
 							error = True
 							break
 						else:
-							for dkey, dvalue in svalue.items():
-								if not isinstance(dkey, str) or not dkey:
+							for tkey, tvalue in svalue.items():
+								if not isinstance(tkey, str) or not tkey:
 									self.__error(f"Template[{pkey}][{skey}]: All primary keys must be non-empty strings")
 									error = True
 									break
-								elif not isinstance(dvalue, str):
-									self.__error(f"Template[{pkey}][{skey}][{dkey}]: Must be a string")
+								elif not isinstance(tvalue, str):
+									self.__error(f"Template[{pkey}][{skey}][{tkey}]: Must be a string")
 									error = True
 									break
 							if error:
@@ -1144,6 +1139,7 @@ def main():
 				validate.get_arg("results"),
 				plaintext,
 				validate.get_arg("excludes"),
+				validate.get_arg("user_agents"),
 				validate.get_arg("debug")
 			)
 			chad_extractor = ChadExtractor(
@@ -1157,7 +1153,6 @@ def main():
  				validate.get_arg("auto_throttle"),
  				validate.get_arg("retries"),
  				validate.get_arg("request_timeout"),
- 				validate.get_arg("user_agents"),
  				validate.get_arg("proxy"),
  				validate.get_arg("debug")
  			)
