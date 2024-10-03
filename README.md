@@ -6,6 +6,11 @@ Tested on Kali Linux v2024.2 (64-bit).
 
 Made for educational purposes. I hope it will help!
 
+Future plans:
+
+* for Chad Extractor, detect if Playwright Chromium is not installed,
+* for Chad Extractor, find a way to bypass the auth. wall for `linkedin-user`.
+
 ## Table of Contents
 
 * [How to Install](#how-to-install)
@@ -161,8 +166,6 @@ Prepare the template as [social_media_template.json](https://github.com/ivan-sin
    }
 }
 ```
-
-_At the moment, I am unable to bypass the auth. wall to validate LinkedIn users, i.e., for `linkedin-user`._
 
 **Make sure your regular expressions return only one capturing group, e.g., `[1, 2, 3, 4]`; and not a touple, e.g., `[(1, 2), (3, 4)]`.**
 
