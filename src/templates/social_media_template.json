@@ -1,0 +1,63 @@
+{
+   "telegram":{
+      "extract":"t\\.me\\/(?:(?!(?:share)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"<meta property=\"og:title\" content=\"Telegram: Contact .+?\">"
+   },
+   "discord":{
+      "extract":"discord\\.(?:com|gg)\\/invite\\/[\\w\\d\\.\\_\\-\\+\\@]+(?<!\\.)",
+      "extract_prepend":"https://",
+      "validate":"Invite Invalid",
+      "validate_browser":true,
+      "validate_browser_wait":6
+   },
+   "youtube":{
+      "extract":"youtube\\.com\\/(?:c|channel)\\/[\\w\\d\\.\\_\\-\\+\\@]+(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"<iframe.+?src=\"\\/error\\?src=404.+?\">",
+      "validate_cookies":{
+         "SOCS":"CAESEwgDEgk2OTk3ODk2MzcaAmVuIAEaBgiAn5S6Bg"
+      }
+   },
+   "twitter":{
+      "extract":"(?<=(?<!pic\\.)twitter|(?<!pic\\.)x)\\.com\\/(?:(?!(?:[\\w]{2}\\/)*(?:explore|hashtag|home|i|intent|library|media|personalization|privacy|search|share|tos|widgets\\.js)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://x",
+      "validate":"This account doesn.?t exist",
+      "validate_browser":true,
+      "validate_cookies":{
+         "night_mode":"2"
+      }
+   },
+   "facebook":{
+      "extract":"facebook\\.com\\/(?:(?!(?:about|dialog|gaming|groups|public|sharer|share\\.php|terms\\.php)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"This (?:content|page) isn't available",
+      "validate_browser":true
+   },
+   "instagram":{
+      "extract":"instagram\\.com\\/(?:(?!(?:about|accounts|ar|explore|p)(?:(?:\\/|\\?|\\\\|\"|\\<)*$|(?:\\/|\\?|\\\\|\\\"|\\<)[\\s\\S]))[\\w\\d\\.\\_\\-\\+\\@]+)(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "extract_append":"/",
+      "validate":"Sorry, this page isn't available\\.",
+      "validate_browser":true
+   },
+   "tiktok":{
+      "extract":"(?<!vt\\.)tiktok\\.com\\/\\@[\\w\\d\\.\\_\\-\\+\\@]+(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"Couldn't find this account"
+   },
+   "linkedin-company":{
+      "extract":"linkedin\\.com\\/company\\/[\\w\\d\\.\\_\\-\\+\\@\\&]+(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"Page not found",
+      "validate_cookies":{
+         "bcookie":"v=2",
+         "lang":"v=2&lang=en-us"
+      }
+   },
+   "linkedin-user":{
+      "extract":"linkedin\\.com\\/in\\/[\\w\\d\\.\\_\\-\\+\\@\\&]+(?<!\\.)",
+      "extract_prepend":"https://www.",
+      "validate":"An exact match for .+ could not be found\\."
+   }
+}
