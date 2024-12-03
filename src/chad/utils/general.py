@@ -4,7 +4,7 @@ import colorama, datetime, json, termcolor, typing
 
 colorama.init(autoreset = True)
 
-def get_timestamp(message):
+def get_timestamp(message: str):
 	"""
 	Get the current timestamp.
 	"""

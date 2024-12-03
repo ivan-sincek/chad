@@ -40,7 +40,7 @@ def jdump(data: typing.Any):
 
 # ----------------------------------------
 
-def get_timestamp(message):
+def get_timestamp(message: str):
 	"""
 	Get the current timestamp.
 	"""
