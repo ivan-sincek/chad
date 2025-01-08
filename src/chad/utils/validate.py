@@ -50,7 +50,7 @@ class MyArgParser(argparse.ArgumentParser):
 		print("USER AGENTS")
 		print("    User agents to use")
 		print("    Default: random-all")
-		print("    -a, --user-agents = user_agents.txt | random(-all) | curl/3.30.1 | etc.")
+		print("    -a, --user-agents = user_agents.txt | random[-all] | curl/3.30.1 | etc.")
 		print("PROXIES")
 		print("    File containing web proxies or a single web proxy to use")
 		print("    -x, --proxies = proxies.txt | http://127.0.0.1:8080 | etc.")

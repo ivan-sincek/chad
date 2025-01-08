@@ -320,7 +320,7 @@ MAXIMUM PAGES
 USER AGENTS
     User agents to use
     Default: random-all
-    -a, --user-agents = user_agents.txt | random(-all) | curl/3.30.1 | etc.
+    -a, --user-agents = user_agents.txt | random[-all] | curl/3.30.1 | etc.
 PROXIES
     File containing web proxies or a single web proxy to use
     -x, --proxies = proxies.txt | http://127.0.0.1:8080 | etc.
@@ -402,7 +402,7 @@ REQUEST TIMEOUT
 USER AGENTS
     User agents to use
     Default: random-all
-    -a, --user-agents = user_agents.txt | random(-all) | curl/3.30.1 | etc.
+    -a, --user-agents = user_agents.txt | random[-all] | curl/3.30.1 | etc.
 PROXY
     Web proxy to use
     -x, --proxy = http://127.0.0.1:8080 | etc.
