@@ -18,6 +18,7 @@ dependencies = [
 	"alive-progress>=3.1.5",
 	"asyncio>=3.4.3",
 	"colorama>=0.4.6",
+	"python-dateutil>=2.9.0",
 	"nagooglesearch>=8.0",
 	"playwright>=1.47.0",
 	"regex>=2023.8.8",
