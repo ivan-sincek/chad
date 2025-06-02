@@ -2,8 +2,6 @@
 
 Search Google Dorks like Chad. Based on [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch).
 
-If you keep getting no results, you may need to refresh your tracking cookies in [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L167).
-
 Tested on Kali Linux v2024.2 (64-bit).
 
 Made for educational purposes. I hope it will help!
@@ -67,6 +65,8 @@ python3 -m pip install dist/google_chad-7.2-py3-none-any.whl
 ```bash
 chad -q 'intitle:"index of /" intext:"parent directory"'
 ```
+
+If you keep getting no results, you may need to refresh your tracking cookies in [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L167).
 
 ## File Download
 

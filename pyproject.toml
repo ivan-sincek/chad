@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=75.3.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -34,6 +34,9 @@ dependencies = [
 [project.scripts]
 chad = "chad.main:main"
 chad-extractor = "chad_extractor.main:main"
+
+[tool.setuptools]
+license-files = []
 
 [tool.setuptools.packages.find]
 where = ["src"]
