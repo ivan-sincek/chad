@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-APP_VERSION = "v7.1"
+APP_VERSION = "v7.2"
 
 def banner():
 	"""
@@ -8,7 +8,7 @@ def banner():
 	"""
 	print("#########################################################################")
 	print("#                                                                       #")
-	print("#                               Chad v7.1                               #")
+	print("#                               Chad v7.2                               #")
 	print("#                                                                       #")
 	print("# Search Google Dorks like Chad.                                        #")
 	print("# GitHub repository at github.com/ivan-sincek/chad.                     #")

@@ -2,6 +2,8 @@
 
 Search Google Dorks like Chad. Based on [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch).
 
+If you keep getting no results, you may need to refresh your tracking cookies in [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L167).
+
 Tested on Kali Linux v2024.2 (64-bit).
 
 Made for educational purposes. I hope it will help!
@@ -57,7 +59,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-7.1-py3-none-any.whl
+python3 -m pip install dist/google_chad-7.2-py3-none-any.whl
 ```
 
 ## Shortest Possible
@@ -65,8 +67,6 @@ python3 -m pip install dist/google_chad-7.1-py3-none-any.whl
 ```bash
 chad -q 'intitle:"index of /" intext:"parent directory"'
 ```
-
-If you keep getting no results, you may need to refresh your tracking cookies in [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L167).
 
 ## File Download
 
@@ -279,7 +279,7 @@ Additionally, to avoid hitting rate limits on platforms like [Instagram's](https
 ## Usage
 
 ```fundamental
-Chad v7.1 ( github.com/ivan-sincek/chad )
+Chad v7.2 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]
@@ -346,7 +346,7 @@ DEBUG
 ```
 
 ```fundamental
-Chad Extractor v7.1 ( github.com/ivan-sincek/chad )
+Chad Extractor v7.2 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results      -o out         [-s sleep] [-rs random-sleep]
 Example: chad-extractor -t template.json -res chad_results -o report.json [-s 1.5  ] [-rs             ]
