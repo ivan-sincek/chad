@@ -236,10 +236,11 @@ class Chad:
 		Proxies are ignored.
 		"""
 		print(general.get_timestamp("Downloading files... Proxies are ignored"))
-		with alive_progress.alive_bar(len(self.__results), title = "Progress:") as bar:
+		urls = self.__get_urls()
+		with alive_progress.alive_bar(len(urls), title = "Progress:") as bar:
 			with concurrent.futures.ThreadPoolExecutor(max_workers = threads) as executor:
 				subprocesses = []
-				for url in self.__get_urls():
+				for url in urls:
 					subprocesses.append(executor.submit(self.__get, url, directory))
 				for subprocess in concurrent.futures.as_completed(subprocesses):
 					result: file.File = subprocess.result()
