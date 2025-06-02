@@ -66,6 +66,8 @@ python3 -m pip install dist/google_chad-7.1-py3-none-any.whl
 chad -q 'intitle:"index of /" intext:"parent directory"'
 ```
 
+If you keep getting no results, you may need to refresh your tracking cookies in [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L167).
+
 ## File Download
 
 Did you say Metagoofil?!
