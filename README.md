@@ -2,6 +2,10 @@
 
 Search Google Dorks like Chad. Based on [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch).
 
+Google frequently changes cookies, so you may need to specify your own using the `-b` option if the default ones no longer work - if you keep getting no results.
+
+Default cookies can be found at [here](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L169).
+
 Tested on Kali Linux v2024.2 (64-bit).
 
 Made for educational purposes. I hope it will help!
@@ -57,7 +61,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-7.2-py3-none-any.whl
+python3 -m pip install dist/google_chad-7.3-py3-none-any.whl
 ```
 
 ## Shortest Possible
@@ -66,7 +70,9 @@ python3 -m pip install dist/google_chad-7.2-py3-none-any.whl
 chad -q 'intitle:"index of /" intext:"parent directory"'
 ```
 
-If you keep getting no results, you may need to refresh your tracking cookies in [ivan-sincek/nagooglesearch](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L167).
+Google frequently changes cookies, so you may need to specify your own using the `-b` option if the default ones no longer work - if you keep getting no results.
+
+Default cookies can be found at [here](https://github.com/ivan-sincek/nagooglesearch/blob/main/src/nagooglesearch/nagooglesearch.py#L169).
 
 ## File Download
 
@@ -279,7 +285,7 @@ Additionally, to avoid hitting rate limits on platforms like [Instagram's](https
 ## Usage
 
 ```fundamental
-Chad v7.2 ( github.com/ivan-sincek/chad )
+Chad v7.3 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]
@@ -319,6 +325,10 @@ MAXIMUM PAGES
     Maximum sleep time between Google pages
     Default: minimum + 10
     -max-p, --maximum-pages = 60 | etc.
+COOKIE
+    Specify any number of extra HTTP cookies
+    Google frequently changes cookies, so you may need to specify your own if the default ones no longer work
+    -b, --cookie = SOCS=3301 | etc.
 USER AGENTS
     User agents to use
     Default: random-all
@@ -346,7 +356,7 @@ DEBUG
 ```
 
 ```fundamental
-Chad Extractor v7.2 ( github.com/ivan-sincek/chad )
+Chad Extractor v7.3 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results      -o out         [-s sleep] [-rs random-sleep]
 Example: chad-extractor -t template.json -res chad_results -o report.json [-s 1.5  ] [-rs             ]

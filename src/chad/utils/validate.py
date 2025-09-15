@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from . import config, directory, file, general
+from . import config, cookie, directory, file, general
 
 import argparse, nagooglesearch, sys
 
@@ -47,6 +47,10 @@ class MyArgParser(argparse.ArgumentParser):
 		print("    Maximum sleep time between Google pages")
 		print("    Default: minimum + 10")
 		print("    -max-p, --maximum-pages = 60 | etc.")
+		print("COOKIE")
+		print("    Specify any number of extra HTTP cookies")
+		print("    Google frequently changes cookies, so you may need to specify your own if the default ones no longer work")
+		print("    -b, --cookie = SOCS=3301 | etc.")
 		print("USER AGENTS")
 		print("    User agents to use")
 		print("    Default: random-all")
@@ -74,7 +78,7 @@ class MyArgParser(argparse.ArgumentParser):
 
 	def error(self, message):
 		if len(sys.argv) > 1:
-			print("Missing a mandatory option (-q) and/or optional (-s, -t, -tr, -pr, -min-q, -max-q, -min-p, -max-p, -a, -x, -dir, -th, -o, -nsos, -dbg)")
+			print("Missing a mandatory option (-q) and/or optional (-s, -t, -tr, -pr, -min-q, -max-q, -min-p, -max-p, -b, -a, -x, -dir, -th, -o, -nsos, -dbg)")
 			print("Use -h or --help for more info")
 		else:
 			self.print_help()
@@ -96,6 +100,7 @@ class Validate:
 		self.__parser.add_argument("-max-q", "--maximum-queries"  , required = False, type   = str         , default = ""   )
 		self.__parser.add_argument("-min-p", "--minimum-pages"    , required = False, type   = str         , default = ""   )
 		self.__parser.add_argument("-max-p", "--maximum-pages"    , required = False, type   = str         , default = ""   )
+		self.__parser.add_argument("-b"    , "--cookie"           , required = False, action = "append"    , nargs   = "+"  )
 		self.__parser.add_argument("-a"    , "--user-agents"      , required = False, type   = str         , default = ""   )
 		self.__parser.add_argument("-x"    , "--proxies"          , required = False, type   = str         , default = ""   )
 		self.__parser.add_argument("-dir"  , "--directory"        , required = False, type   = str         , default = ""   )
@@ -118,6 +123,7 @@ class Validate:
 		self.__validate_maximum_queries()
 		self.__validate_minimum_pages()
 		self.__validate_maximum_pages()
+		self.__validate_cookie()
 		self.__validate_user_agents()
 		self.__validate_proxies()
 		self.__validate_directory()
@@ -223,6 +229,17 @@ class Validate:
 				if tmp <= 0:
 					self.__error("Maximum sleep time between Google pages must be greater than zero")
 		self.__args.maximum_pages = tmp
+
+	def __validate_cookie(self):
+		tmp = {}
+		if self.__args.cookie:
+			for entry in self.__args.cookie:
+				key, value = cookie.get_key_value(entry[0])
+				if not key:
+					self.__error(f"Invalid HTTP cookie: {entry[0]}")
+					continue
+				tmp[key] = value
+		self.__args.cookie = tmp
 
 	def __validate_user_agents(self):
 		tmp = nagooglesearch.get_all_user_agents()

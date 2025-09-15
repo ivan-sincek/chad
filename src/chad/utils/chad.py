@@ -32,6 +32,7 @@ class Chad:
 		maximum_queries: int,
 		minimum_pages  : int,
 		maximum_pages  : int,
+		cookies        : dict[str, str],
 		user_agents    : list[str],
 		proxies        : list[str],
 		sleep_on_start : bool,
@@ -49,6 +50,7 @@ class Chad:
 		self.__maximum_queries = maximum_queries
 		self.__minimum_pages   = minimum_pages
 		self.__maximum_pages   = maximum_pages
+		self.__cookies         = cookies
 		self.__user_agents     = user_agents
 		self.__user_agents_len = len(self.__user_agents)
 		self.__proxies         = proxy.Proxies(proxies)
@@ -132,6 +134,7 @@ class Chad:
 					client = nagooglesearch.GoogleClient(
 						tld               = "com",
 						search_parameters = search_parameters,
+						cookies           = self.__cookies,
 						user_agent        = self.__get_user_agent(),
 						proxy             = result.proxy,
 						max_results       = self.__total_results,

@@ -33,6 +33,7 @@ def main():
 			args.maximum_queries,
 			args.minimum_pages,
 			args.maximum_pages,
+			args.cookie,
 			args.user_agents,
 			args.proxies,
 			not args.no_sleep_on_start,
