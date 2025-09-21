@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-APP_VERSION = "v7.3"
+APP_VERSION = "v7.4"
 
 REPORT_EXTENSION = ".report.json"
 
@@ -10,7 +10,7 @@ def banner():
 	"""
 	print("#########################################################################")
 	print("#                                                                       #")
-	print("#                          Chad Extractor v7.3                          #")
+	print("#                          Chad Extractor v7.4                          #")
 	print("#                                                                       #")
 	print("# Extract and validate data from Chad results or plaintext files.       #")
 	print("# GitHub repository at github.com/ivan-sincek/chad.                     #")

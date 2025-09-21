@@ -61,7 +61,7 @@ python3 -m pip install --upgrade build
 
 python3 -m build
 
-python3 -m pip install dist/google_chad-7.3-py3-none-any.whl
+python3 -m pip install dist/google_chad-7.4-py3-none-any.whl
 ```
 
 ## Shortest Possible
@@ -285,7 +285,7 @@ Additionally, to avoid hitting rate limits on platforms like [Instagram's](https
 ## Usage
 
 ```fundamental
-Chad v7.3 ( github.com/ivan-sincek/chad )
+Chad v7.4 ( github.com/ivan-sincek/chad )
 
 Usage:   chad -q queries     [-s site         ] [-x proxies    ] [-o out         ]
 Example: chad -q queries.txt [-s *.example.com] [-x proxies.txt] [-o results.json]
@@ -356,7 +356,7 @@ DEBUG
 ```
 
 ```fundamental
-Chad Extractor v7.3 ( github.com/ivan-sincek/chad )
+Chad Extractor v7.4 ( github.com/ivan-sincek/chad )
 
 Usage:   chad-extractor -t template      -res results      -o out         [-s sleep] [-rs random-sleep]
 Example: chad-extractor -t template.json -res chad_results -o report.json [-s 1.5  ] [-rs             ]
@@ -431,18 +431,18 @@ DEBUG
 
 ## Images
 
-<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/single_google_dork.png" alt="(Chad) File Download - Single Google Dork"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/ivan-sincek/chad/refs/heads/main/img/single_google_dork.png" alt="(Chad) File Download - Single Google Dork"></p>
 
 <p align="center">Figure 1 - (Chad) File Download - Single Google Dork</p>
 
-<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/multiple_google_dorks.png" alt="(Chad) Broken Link Hijacking - Multiple Google Dorks"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/ivan-sincek/chad/refs/heads/main/img/multiple_google_dorks.png" alt="(Chad) Broken Link Hijacking - Multiple Google Dorks"></p>
 
 <p align="center">Figure 2 - (Chad) Broken Link Hijacking - Multiple Google Dorks</p>
 
-<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/extraction.png" alt="Extraction"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/ivan-sincek/chad/refs/heads/main/img/extraction.png" alt="Extraction"></p>
 
 <p align="center">Figure 3 - (Chad Extractor) Extraction</p>
 
-<p align="center"><img src="https://github.com/ivan-sincek/chad/blob/main/img/validation.png" alt="Validation"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/ivan-sincek/chad/refs/heads/main/img/validation.png" alt="Validation"></p>
 
 <p align="center">Figure 4 - (Chad Extractor) Validation</p>
