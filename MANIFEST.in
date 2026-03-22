@@ -1,0 +1,4 @@
+include src/chad/*.py
+include src/chad_extractor/*.py
+include src/dorks/*.txt
+include src/templates/*.json
