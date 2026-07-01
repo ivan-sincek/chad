@@ -176,7 +176,7 @@ Prepare the template as [social_media_template.json](https://github.com/ivan-sin
 
 **Make sure your regular expressions return only one capturing group, e.g., `[1, 2, 3, 4]`; and not a touple, e.g., `[(1, 2), (3, 4)]`.**
 
-Make sure to properly escape regular expression specific symbols in your template file, e.g., make sure to escape dot `.` as `\\.`, and forward slash `/` as `\\/`, etc.
+Make sure to escape special characters if you don't want them interpreted as regual expression symbols in your template file, e.g., make sure to escape dot `.` as `\\.`, and forward slash `/` as `\\/`, etc.
 
 All regular expression searches are case-insensitive.
 
